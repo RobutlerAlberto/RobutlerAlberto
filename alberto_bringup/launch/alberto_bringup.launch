@@ -22,6 +22,6 @@
 
     <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>
 
-    <node pkg="alberto_vision" name="get_camera_footage" type="get_camera_footage.py" output="screen"/>
+    <node pkg="alberto_vision" name="get_camera_footage" type="alberto_real_time_detection.py" output="screen"/>
 
 </launch>

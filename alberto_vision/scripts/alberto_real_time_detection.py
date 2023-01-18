@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # --------------------------------------------------
-# Fábio Sousa.
+# Fábio, Isabel 
 # PSR, January 2023.
 # RobutlerAlberto
 # --------------------------------------------------
@@ -8,16 +8,34 @@
 # Necessary imports
 import cv2
 import numpy as np
+from alberto_get_camera_footage import image
+
+# ----------------------------------------------
+# Initialization
+# ----------------------------------------------
 
 def main():
+    
+    #Calls the image class
+    bottom_front_camera = image()      
+    
+    # Starts function with necessary args
+    object_detection(bottom_front_camera.image_args, bottom_front_camera)
+
+# ----------------------------------------------
+# Execution
+# ----------------------------------------------
+
+def object_detection(alberto_camera, bottom_front_camera):
 
     # Load YOLO
     # Absolute path to files is needed
     path =r"/home/fabio/catkin_ws/src/RobutlerAlberto/alberto_vision/src" #! Change path to absolute path
-    weight = path+r"/yolov3.weights"
-    cfg = path+r"/yolov3.cfg"
+    weight = path+r"/yolov3-tiny.weights"
+    cfg = path+r"/yolov3-tiny.cfg"
     net = cv2.dnn.readNetFromDarknet(cfg, weight)
 
+    #? This part detects objects and connects the identifiers to the object's bounding boxes
     classes = []
 
     with open("/home/fabio/catkin_ws/src/RobutlerAlberto/alberto_vision/src/coco.names", "r") as f:
@@ -27,13 +45,12 @@ def main():
     output_layers = [layer_names[i- 1] for i in net.getUnconnectedOutLayers()]
     colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
-    # Loading web cam
-    cap = cv2.VideoCapture(0)
-
     while True:
+        
+        # Stream read
+        img = alberto_camera['cv_image']
 
-        # Cap read
-        _,img = cap.read()
+        # Get shape
         height, width, channels = img.shape
 
         # Detecting objects
@@ -82,47 +99,14 @@ def main():
                 color = colors[i]
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
                 cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
-
-        cv2.imshow("Image", img)
-
-        if cv2.waitKey(1) == ord('q'):
-            break
         
-    cap.release()
-    cv2.destroyAllWindows()
+# ----------------------------------------------
+# Visualization
+# ----------------------------------------------
+
+        bottom_front_camera.showImage(img)
+
+
 
 if __name__ == "__main__":
     main()
-
-#* Failed attempt. Here is used imageai with pytorch, but there's an error I couldn't fix.
-# from imageai.Detection import VideoObjectDetection
-# import cv2
-
-# def main():
-#     obj_detect = VideoObjectDetection()
-#     obj_detect.setModelTypeAsYOLOv3()
-#     obj_detect.setModelPath('/home/fabio/catkin_ws/src/RobutlerAlberto/alberto_vision/scr/yolov3.pt')
-#     obj_detect.loadModel()
-
-#     cam_feed = cv2.VideoCapture(0)
-#     cam_feed.set(cv2.CAP_PROP_FRAME_WIDTH, 650)
-#     cam_feed.set(cv2.CAP_PROP_FRAME_HEIGHT, 750)
-
-#     while True:    
-#         ret, img = cam_feed.read()   
-#         annotated_image, preds = obj_detect.detectObjectsFromImage(input_image=img,
-#                         input_type="array",
-#                         output_type="array",
-#                         display_percentage_probability=False,
-#                         display_object_name=True)
-
-#         cv2.imshow("", annotated_image)     
-        
-#         if (cv2.waitKey(1) & 0xFF == ord("q")) or (cv2.waitKey(1)==27):
-#             break
-
-#     cam_feed.release()
-#     cv2.destroyAllWindows()
-
-# if __name__ == "__main__":
-#     main()
