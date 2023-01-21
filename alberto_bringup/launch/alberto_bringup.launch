@@ -3,6 +3,7 @@
     <arg name="x_pos" default="-1.5"/>
     <arg name="y_pos" default="-4.0"/>
     <arg name="z_pos" default="0.0"/>
+    <arg name="controller" default="false" doc="control the robot with a controller"/>
 
     <!-- Upload robot description xacro to the ros param -->
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find alberto_description)/urdf/alberto.urdf.xacro" />
@@ -19,7 +20,13 @@
 
     <!-- Launch rviz, loading configuration file -->
     <node name="rviz" pkg="rviz" type="rviz" args="--display-config $(find alberto_bringup)/config/visualization.rviz" required="false"/>
+    
 
-    <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>
+    <!-- Manual Controlling mode -->
+    <include if="$(arg controller)" file="$(find alberto_bringup)/include/alberto_joy_teleop.launch"/>
+    
+    <group unless="$(arg controller)">
+        <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>
+    </group>   
 
 </launch>
