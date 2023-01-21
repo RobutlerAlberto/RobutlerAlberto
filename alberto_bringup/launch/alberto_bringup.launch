@@ -23,7 +23,7 @@
     
 
     <!-- Manual Controlling mode -->
-    <include if="$(arg controller)" file="$(find prometheus_bringup)/launch/include/joy_teleop.launch"/>
+    <include if="$(arg controller)" file="$(find alberto_bringup)/include/alberto_joy_teleop.launch"/>
     
     <group unless="$(arg controller)">
         <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>

@@ -27,17 +27,18 @@ def messageReceivedCallbackJoy(message, **kwargs):
 
     if(forward_axe_value > 0):# Only triggers if halfway pressed
         linear = rangeScaling(forward_axe_value,0 ,1 ,0 ,0.20)
-        print("Going forward")
-        rospy.loginfo("Going forward")
+        # rospy.loginfo("Going forward")
     elif(reverse_axe_value >0):
         linear = -1*rangeScaling(reverse_axe_value,0 ,1 ,0 ,0.20)
-        print("Going reverse")
-        rospy.loginfo("Going reverse")
+        # rospy.loginfo("Going reverse")
 
     else:
         linear = 0
 
-    rospy.loginfo("Linear is " + str(linear)) 
+    # TODO implement verbose mode with an argument
+    # if verbose:
+    #     rospy.loginfo("Linear is " + str(linear)) 
+    #     rospy.loginfo("Angular is " + str(angular)) 
 
     twist_cmd = Twist()  # Message type twist
     twist_cmd.linear.x = linear
