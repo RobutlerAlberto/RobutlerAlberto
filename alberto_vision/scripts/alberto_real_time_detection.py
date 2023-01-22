@@ -9,6 +9,7 @@
 import cv2
 import numpy as np
 from alberto_get_camera_footage import image
+from os import getlogin
 
 # ----------------------------------------------
 # Initialization
@@ -30,15 +31,16 @@ def object_detection(alberto_camera, bottom_front_camera):
 
     # Load YOLO
     # Absolute path to files is needed
-    path =r"/home/fabio/catkin_ws/src/RobutlerAlberto/alberto_vision/src" #! Change path to absolute path
-    weight = path+r"/yolov3-tiny.weights"
-    cfg = path+r"/yolov3-tiny.cfg"
+    user = getlogin()
+    path = r"/home/" + user + r"/catkin_ws/src/RobutlerAlberto/alberto_vision/src" #! Change path to absolute path
+    weight = path + r"/yolov3-tiny.weights"
+    cfg = path + r"/yolov3-tiny.cfg"
     net = cv2.dnn.readNetFromDarknet(cfg, weight)
 
     #? This part detects objects and connects the identifiers to the object's bounding boxes
     classes = []
 
-    with open("/home/fabio/catkin_ws/src/RobutlerAlberto/alberto_vision/src/coco.names", "r") as f:
+    with open("/home/" + user + "/catkin_ws/src/RobutlerAlberto/alberto_vision/src/coco.names", "r") as f:
         classes = [line.strip() for line in f.readlines()]
 
     layer_names = net.getLayerNames()
@@ -47,6 +49,9 @@ def object_detection(alberto_camera, bottom_front_camera):
 
     while True:
         
+        if 'cv_image' not in alberto_camera:
+            continue
+
         # Stream read
         img = alberto_camera['cv_image']
 
@@ -100,9 +105,9 @@ def object_detection(alberto_camera, bottom_front_camera):
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
                 cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
         
-# ----------------------------------------------
-# Visualization
-# ----------------------------------------------
+        # ----------------------------------------------
+        # Visualization
+        # ----------------------------------------------
 
         bottom_front_camera.showImage(img)
 
