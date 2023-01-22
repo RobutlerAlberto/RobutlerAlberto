@@ -7,9 +7,9 @@
 
 # Necessary imports
 import cv2
+import rospkg
 import numpy as np
 from alberto_get_camera_footage import image
-from os import getlogin
 
 # ----------------------------------------------
 # Initialization
@@ -31,8 +31,8 @@ def object_detection(alberto_camera, bottom_front_camera):
 
     # Load YOLO
     # Absolute path to files is needed
-    user = getlogin()
-    path = r"/home/" + user + r"/catkin_ws/src/RobutlerAlberto/alberto_vision/src" #! Change path to absolute path
+    rospack = rospkg.RosPack()
+    path = rospack.get_path('alberto_vision') + r"/src"
     weight = path + r"/yolov3-tiny.weights"
     cfg = path + r"/yolov3-tiny.cfg"
     net = cv2.dnn.readNetFromDarknet(cfg, weight)
@@ -40,7 +40,7 @@ def object_detection(alberto_camera, bottom_front_camera):
     #? This part detects objects and connects the identifiers to the object's bounding boxes
     classes = []
 
-    with open("/home/" + user + "/catkin_ws/src/RobutlerAlberto/alberto_vision/src/coco.names", "r") as f:
+    with open(path + r"/coco.names", "r") as f:
         classes = [line.strip() for line in f.readlines()]
 
     layer_names = net.getLayerNames()
