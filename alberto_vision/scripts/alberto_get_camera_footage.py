@@ -16,7 +16,7 @@ class image:
         
         # rospy.init_node('camera_footage', anonymous=False)
         
-        self.camera_topic = rospy.get_param("~camera", default= "/rrbot/camera1/image_raw")
+        self.camera_topic = rospy.get_param("~camera_topic", default= "/rrbot/camera1/image_raw")
 
         self.bridge = CvBridge()
         # self.image_sub = rospy.Subscriber("/rrbot/camera1/image_raw", Image, self.subscriberCallback)
