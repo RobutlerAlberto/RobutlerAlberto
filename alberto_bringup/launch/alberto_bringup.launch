@@ -29,4 +29,10 @@
         <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>
     </group>   
 
+    <node pkg="alberto_vision" name="yolo_detection" type="alberto_real_time_detection.py" output="screen">
+        <param name="~camera_topic" value="/rrbot/camera1/image_raw"/>
+    </node>
+        
+    
+
 </launch>
