@@ -14,10 +14,13 @@ class image:
 
     def __init__(self):
         
-        rospy.init_node('camera_footage', anonymous=False)
+        # rospy.init_node('camera_footage', anonymous=False)
         
+        self.camera_topic = rospy.get_param("~camera", default= "/rrbot/camera1/image_raw")
+
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/rrbot/camera1/image_raw", Image, self.subscriberCallback)
+        # self.image_sub = rospy.Subscriber("/rrbot/camera1/image_raw", Image, self.subscriberCallback)
+        self.image_sub = rospy.Subscriber(self.camera_topic, Image, self.subscriberCallback)
         self.image_args = {} # Contains cv_image
         self.begin_image = False
     
@@ -35,8 +38,9 @@ class image:
         if not self.begin_image: # Only shows after first image is processed
             return
 
-        # cv2.namedWindow("CV_image")
+        
         cv2.imshow("CV_image", processed)
+
         pressed_key = cv2.waitKey(10) & 0xFF # To prevent NumLock issue
 
         if pressed_key == ord('q'):

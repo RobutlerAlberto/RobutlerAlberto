@@ -8,6 +8,7 @@
 # Necessary imports
 import cv2
 import rospkg
+import rospy
 import numpy as np
 from alberto_get_camera_footage import image
 
@@ -17,6 +18,7 @@ from alberto_get_camera_footage import image
 
 def main():
     
+    rospy.init_node('camera_footage', anonymous=False)
     #Calls the image class
     bottom_front_camera = image()      
     
@@ -47,7 +49,7 @@ def object_detection(alberto_camera, bottom_front_camera):
     output_layers = [layer_names[i- 1] for i in net.getUnconnectedOutLayers()]
     colors = np.random.uniform(0, 255, size=(len(classes), 3))
 
-    while True:
+    while not rospy.is_shutdown():
         
         if 'cv_image' not in alberto_camera:
             continue
