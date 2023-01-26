@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="laser_scan_topic" default="/scan"/>
+    <arg name="initial_pose_x" default="0.0"/>
+    <arg name="initial_pose_y" default="0.0"/>
+    <arg name="initial_pose_a" default="0.0"/>
+
+    <!--!Node to create new maps from scratch, only used initially  -->
+    <!-- <node pkg="gmapping" type="slam_gmapping" name="executable">
+       <arg name="_base_frame" default="base_footprint"/> 
+    </node> -->
+
+
+    <arg name="map_file" default="$(find alberto_navigation)/maps/apartment_map1.yaml"/>
+    <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)">
+        
+    </node>
+
+
+
+
+    <node pkg="amcl" type="amcl" name="AMCL_node">
+
+
+
+
+
+    </node>
+
+</launch>

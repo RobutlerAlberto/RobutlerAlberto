@@ -11,8 +11,8 @@
     <!--Bloco 2: Criação de um world om gazebo.-->
     <group unless="$(arg empty_map)">
         <include file="$(find gazebo_ros)/launch/empty_world.launch">
-            <!-- <arg name="world_name" value="$(find alberto_description)/worlds/psr_apartment.world"/> -->
-            <arg name="world_name" value="$(arg map_name)"/>
+            <arg name="world_name" value="$(find alberto_description)/worlds/psr_apartment.world"/>
+            <!-- <arg name="world_name" value="$(arg map_name)"/> -->
             <arg name="paused" value="false"/>
             <arg name="use_sim_time" value="true"/>
             <arg name="gui" value="true"/>
