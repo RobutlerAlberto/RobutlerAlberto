@@ -20,7 +20,9 @@ def main():
     
     rospy.init_node('camera_footage', anonymous=False)
     #Calls the image class
-    bottom_front_camera = image()      
+
+    bottom_fron_camera_topic = rospy.get_param("~camera_topic", default= "/rrbot/camera1/image_raw")
+    bottom_front_camera = image(bottom_fron_camera_topic)      
     
     # Starts function with necessary args
     object_detection(bottom_front_camera.image_args, bottom_front_camera)
