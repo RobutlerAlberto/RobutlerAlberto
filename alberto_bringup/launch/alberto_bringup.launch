@@ -3,11 +3,14 @@
     <arg name="x_pos" default="-1.5"/>
     <arg name="y_pos" default="-4.0"/>
     <arg name="z_pos" default="0.0"/>
-    <arg name="controller" default="false" doc="control the robot with a controller"/>
-
+    <arg name="controller" default="false" doc="Control the robot with a controller"/>
+    <arg name="bagfile" default="false" doc="Test Robutler detection with a previously recorded bagfile"/>
+    
+    
     <!-- Upload robot description xacro to the ros param -->
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find alberto_description)/urdf/alberto.urdf.xacro" />
 
+    
     <!-- Spawn the robot in gazebo -->
     <include file="$(find alberto_bringup)/launch/alberto_spawn.launch">
         <arg name="x_pos" value="$(arg x_pos)"/>
@@ -15,11 +18,23 @@
         <arg name="z_pos" value="$(arg z_pos)"/>
     </include>
 
+    
     <!-- Launch robot state publisher to get tf from joint_state -->
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
 
+    
     <!-- Launch rviz, loading configuration file -->
     <node name="rviz" pkg="rviz" type="rviz" args="--display-config $(find alberto_bringup)/config/visualization.rviz" required="false"/>
+    
+    
+    <!-- Launch Robotuler detection with a previously recorded bagfile -->
+    <group if="$(arg bagfile)">.
+        <!-- Use bagfile time -->
+        <param name="/use_sim_time" value="true"/>
+        <!-- Read bagfile in loop -->
+        <arg name="bag_file_name" value="bertinho"/>
+        <node pkg="rosbag" type="play" name="rosbag_play" output="screen" args="--clock $(find alberto_vision)/bagfiles/$(arg bag_file_name).bag"/>
+    </group>
     
 
     <!-- Manual Controlling mode -->
@@ -29,10 +44,11 @@
         <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>
     </group>   
 
+
+    <!-- Launch real time detection file -->
     <node pkg="alberto_vision" name="yolo_detection" type="alberto_real_time_detection.py" output="screen">
         <param name="~camera_topic" value="/rrbot/camera1/image_raw"/>
     </node>
-        
     
 
 </launch>
