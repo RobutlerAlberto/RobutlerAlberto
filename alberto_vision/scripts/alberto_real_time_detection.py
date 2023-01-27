@@ -11,6 +11,26 @@ import rospkg
 import rospy
 import numpy as np
 from alberto_get_camera_footage import image
+import open3d as o3d
+
+def is_plane(depth_map):
+        # Create a point cloud from the depth map
+        indices = np.column_stack(np.where(depth_map != 0))
+        points = np.column_stack((indices, depth_map[np.where(depth_map != 0)]))
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(points)
+
+        # Estimate normals
+        o3d.geometry.estimate_normals(pcd, search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+
+        # Get the normal vector of the point cloud
+        normal_vector = pcd.normals[0]
+
+        # Check if the normal vector is roughly constant
+        if abs(normal_vector[0]) < 0.1 and abs(normal_vector[1]) < 0.1 and abs(normal_vector[2]-1) < 0.1:
+            return True
+        return False
+
 
 # ----------------------------------------------
 # Initialization
@@ -19,17 +39,18 @@ from alberto_get_camera_footage import image
 def main():
     
     rospy.init_node('camera_footage', anonymous=False)
-    #Calls the image class
-    bottom_front_camera = image()      
+    # Calls the image class
+    rgb_camera = image("/depth_camera/color/image_raw")
+    depth_map = image("/depth_camera/depth/image_raw")
     
     # Starts function with necessary args
-    object_detection(bottom_front_camera.image_args, bottom_front_camera)
+    object_detection(rgb_camera, depth_map)
 
 # ----------------------------------------------
 # Execution
 # ----------------------------------------------
 
-def object_detection(alberto_camera, bottom_front_camera):
+def object_detection(rgb_camera, depth_map):
 
     # Load YOLO
     # Absolute path to files is needed
@@ -51,14 +72,16 @@ def object_detection(alberto_camera, bottom_front_camera):
 
     while not rospy.is_shutdown():
         
-        if 'cv_image' not in alberto_camera:
+        if 'cv_image' not in rgb_camera.image_args or 'cv_image' not in depth_map.image_args:
             continue
 
         # Stream read
-        img = alberto_camera['cv_image']
+        img = rgb_camera.image_args['cv_image']
+        dm = depth_map.image_args['cv_image']
+        # cv2.imwrite('depth_map.png', dm)
 
         # Get shape
-        height, width, channels = img.shape
+        height, width, _ = img.shape
 
         # Detecting objects
         blob = cv2.dnn.blobFromImage(img, 0.00392, (320, 320), (0, 0, 0), True, crop=False)
@@ -91,7 +114,7 @@ def object_detection(alberto_camera, bottom_front_camera):
                     y = int(center_y - h / 2)
                     boxes.append([x, y, w, h])
                     confidences.append(float(confidence))
-                    class_ids.append(class_id)
+                    class_ids.append(class_id) 
 
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
 
@@ -102,6 +125,13 @@ def object_detection(alberto_camera, bottom_front_camera):
             if i in indexes:
 
                 x, y, w, h = boxes[i]
+
+                # interest_area = dm[y:h, x:w]
+                # rospy.loginfo(is_plane(interest_area))
+                
+                # if (interest_area.any()):
+                #     depth_map.showImage(interest_area)
+
                 label = str(classes[class_ids[i]])
                 color = colors[i]
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
@@ -111,7 +141,7 @@ def object_detection(alberto_camera, bottom_front_camera):
         # Visualization
         # ----------------------------------------------
 
-        bottom_front_camera.showImage(img)
+        rgb_camera.showImage(img)
 
 
 
