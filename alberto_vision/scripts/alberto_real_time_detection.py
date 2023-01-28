@@ -11,25 +11,14 @@ import rospkg
 import rospy
 import numpy as np
 from alberto_get_camera_footage import image
-import open3d as o3d
 
-def is_plane(depth_map):
-        # Create a point cloud from the depth map
-        indices = np.column_stack(np.where(depth_map != 0))
-        points = np.column_stack((indices, depth_map[np.where(depth_map != 0)]))
-        pcd = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(points)
 
-        # Estimate normals
-        o3d.geometry.estimate_normals(pcd, search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
 
-        # Get the normal vector of the point cloud
-        normal_vector = pcd.normals[0]
-
-        # Check if the normal vector is roughly constant
-        if abs(normal_vector[0]) < 0.1 and abs(normal_vector[1]) < 0.1 and abs(normal_vector[2]-1) < 0.1:
-            return True
-        return False
+def is_plane(image):
+    image = np.uint8(image)
+    img_blur = cv2.GaussianBlur(image,(3,3), sigmaX=0, sigmaY=0)
+    edges = cv2.Canny(image=img_blur, threshold1=0, threshold2=80)
+    return cv2.countNonZero(edges) == 0
 
 
 # ----------------------------------------------
@@ -114,34 +103,38 @@ def object_detection(rgb_camera, depth_map):
                     y = int(center_y - h / 2)
                     boxes.append([x, y, w, h])
                     confidences.append(float(confidence))
-                    class_ids.append(class_id) 
+                    class_ids.append(class_id)
 
         indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
 
         font = cv2.FONT_HERSHEY_PLAIN
 
+        # new_boxes = []
         for i in range(len(boxes)):
 
             if i in indexes:
 
                 x, y, w, h = boxes[i]
-
                 # interest_area = dm[y:h, x:w]
-                # rospy.loginfo(is_plane(interest_area))
-                
-                # if (interest_area.any()):
-                #     depth_map.showImage(interest_area)
 
-                label = str(classes[class_ids[i]])
-                color = colors[i]
-                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
+                dm = dm[~np.isnan(dm)]
+                rospy.loginfo(dm)
+                # dm = np.uint8(dm)
+                # rospy.loginfo(dm)
+                
+                # if (dm.all() and not np.isnan(np.sum(dm))): # and not is_plane(interest_area)):
+                #     rospy.loginfo(dm)
+
+                    # label = str(classes[class_ids[i]])
+                    # color = colors[i]
+                    # cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                    # cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
         
         # ----------------------------------------------
         # Visualization
         # ----------------------------------------------
 
-        rgb_camera.showImage(img)
+        # rgb_camera.showImage(img)
 
 
 

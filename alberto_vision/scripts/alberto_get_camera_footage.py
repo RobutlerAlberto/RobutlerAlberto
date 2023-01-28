@@ -32,6 +32,7 @@ class image:
         img = self.bridge.imgmsg_to_cv2(image_msg,"passthrough")
         if self.camera_topic == "/depth_camera/depth/image_raw":
             # normalize depth map (otherwise it's almost all white)
+            # img = img * (255.0/img.max())
             img = cv2.normalize(img, None, 0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
 
         #! If I assign directly to cv_image key, it will show flickers of the non flipped image 
