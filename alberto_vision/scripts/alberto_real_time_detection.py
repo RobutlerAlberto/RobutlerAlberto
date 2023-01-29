@@ -12,6 +12,15 @@ import rospy
 import numpy as np
 from alberto_get_camera_footage import image
 
+
+
+def is_plane(image):
+    image = np.uint8(image)
+    img_blur = cv2.GaussianBlur(image,(3,3), sigmaX=0, sigmaY=0)
+    edges = cv2.Canny(image=img_blur, threshold1=0, threshold2=80)
+    return cv2.countNonZero(edges) == 0
+
+
 # ----------------------------------------------
 # Initialization
 # ----------------------------------------------
@@ -19,17 +28,18 @@ from alberto_get_camera_footage import image
 def main():
     
     rospy.init_node('camera_footage', anonymous=False)
-    #Calls the image class
-    bottom_front_camera = image()      
+    # Calls the image class
+    rgb_camera = image("/depth_camera/color/image_raw")
+    depth_map = image("/depth_camera/depth/image_raw")
     
     # Starts function with necessary args
-    object_detection(bottom_front_camera.image_args, bottom_front_camera)
+    object_detection(rgb_camera, depth_map)
 
 # ----------------------------------------------
 # Execution
 # ----------------------------------------------
 
-def object_detection(alberto_camera, bottom_front_camera):
+def object_detection(rgb_camera, depth_map):
 
     # Load YOLO
     # Absolute path to files is needed
@@ -51,14 +61,15 @@ def object_detection(alberto_camera, bottom_front_camera):
 
     while not rospy.is_shutdown():
         
-        if 'cv_image' not in alberto_camera:
+        if 'cv_image' not in rgb_camera.image_args or 'cv_image' not in depth_map.image_args:
             continue
 
         # Stream read
-        img = alberto_camera['cv_image']
+        img = rgb_camera.image_args['cv_image']
+        dm = depth_map.image_args['cv_image']
 
         # Get shape
-        height, width, channels = img.shape
+        height, width, _ = img.shape
 
         # Detecting objects
         blob = cv2.dnn.blobFromImage(img, 0.00392, (320, 320), (0, 0, 0), True, crop=False)
@@ -102,16 +113,20 @@ def object_detection(alberto_camera, bottom_front_camera):
             if i in indexes:
 
                 x, y, w, h = boxes[i]
-                label = str(classes[class_ids[i]])
-                color = colors[i]
-                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
+                interest_area = dm[y:(y+h), x:(x+w)]
+
+
+                if not is_plane(interest_area):
+                    label = str(classes[class_ids[i]])
+                    color = colors[i]
+                    cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
         
         # ----------------------------------------------
         # Visualization
         # ----------------------------------------------
 
-        bottom_front_camera.showImage(img)
+        rgb_camera.showImage(img)
 
 
 

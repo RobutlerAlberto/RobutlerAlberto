@@ -47,8 +47,7 @@
 
     <!-- Launch real time detection file -->
     <node pkg="alberto_vision" name="yolo_detection" type="alberto_real_time_detection.py" output="screen">
-        <param name="~camera_topic" value="/rrbot/camera1/image_raw"/>
+        <param name="~camera_topic" value="/depth_camera/color/image_raw"/>
     </node>
     
-
 </launch>

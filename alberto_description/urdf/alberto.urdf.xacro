@@ -167,15 +167,15 @@
     </inertial>
   </link>
 
-  <joint name="camera_joint" type="fixed">
+  <joint name="depth_camera_joint" type="fixed">
     <axis xyz="0 1 0" />
     <origin xyz="0 0 0.5" rpy="0 0 0" />
     <parent link="base_link" />
-    <child link="camera_link" />
+    <child link="depth_camera_link" />
   </joint>
 
-  <!-- Camera -->
-  <link name="camera_link">
+  <!-- depth camera -->
+  <link name="depth_camera_link">
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <geometry>

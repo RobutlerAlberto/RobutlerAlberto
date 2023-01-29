@@ -9,29 +9,40 @@ import rospy
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+import numpy as np
 
 class image:
 
-    def __init__(self):
+    def __init__(self, topic = "/depth_camera/color/image_raw"):
         
         # rospy.init_node('camera_footage', anonymous=False)
         
-        self.camera_topic = rospy.get_param("~camera_topic", default= "/rrbot/camera1/image_raw")
+        self.camera_topic = topic # rospy.get_param("~camera_topic", default= "/depth_camera/color/image_raw")
 
         self.bridge = CvBridge()
-        # self.image_sub = rospy.Subscriber("/rrbot/camera1/image_raw", Image, self.subscriberCallback)
+        # self.image_sub = rospy.Subscriber("/depth_camera/color/image_raw", Image, self.subscriberCallback)
         self.image_sub = rospy.Subscriber(self.camera_topic, Image, self.subscriberCallback)
         self.image_args = {} # Contains cv_image
         self.begin_image = False
     
 
-    def subscriberCallback(self,image_msg):
+    def subscriberCallback(self, image_msg):
 
         self.begin_image = True # After receiving first image will be forever true
 
+        if self.camera_topic == "/depth_camera/depth/image_raw":
+            img = self.bridge.imgmsg_to_cv2(image_msg,"32FC1")
+            cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX)
+            img = cv2.convertScaleAbs(img)
+        else:
+            img = self.bridge.imgmsg_to_cv2(image_msg,"bgr8")
+
         #! If I assign directly to cv_image key, it will show flickers of the non flipped image 
-        self.image_args["cv_image"] = self.bridge.imgmsg_to_cv2(image_msg,"bgr8") # Passthrough means wtv the encoding was before, it will be retained
-        rospy.loginfo("Received image message, image shape is " + str(self.image_args["cv_image"].shape))
+        self.image_args["cv_image"] = img
+
+        # if self.camera_topic == "/depth_camera/depth/image_raw":
+        #     rospy.loginfo(self.image_args["cv_image"])  
+        # rospy.loginfo("Received image message, image shape is " + str(self.image_args["cv_image"].shape))
 
     def showImage(self, processed):
 
@@ -48,3 +59,4 @@ class image:
             cv2.destroyAllWindows()
             rospy.signal_shutdown("Order to quit") # Stops ros
             exit()                                 # Exits python script
+
