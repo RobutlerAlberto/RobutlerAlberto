@@ -6,4 +6,12 @@
   <arg name="name" default="alberto"/>
 
   <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg name) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -param robot_description" />
+
+  <node pkg="alberto_bringup" type="alberto_initial_pose_setter.py" name="alberto_initial_pose_setter"> -->
+    <param name="x_pose" value="$(arg x_pos)"/>
+    <param name="y_pose" value="$(arg y_pos)"/>
+    <param name="z_pose" value="$(arg z_pos)"/>
+  </node>
+
+
 </launch>

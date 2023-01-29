@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+    
+    <arg name="x_pos" default="-1.5"/>
+    <arg name="y_pos" default="-4.0"/>
+    <arg name="z_pos" default="0.0"/>
+
+    <node pkg="alberto_bringup" type="alberto_initial_pose_setter.py" name="alberto_initial_pose_setter">
+        <param name="~x_pose" value="$(arg x_pos)"/>
+        <param name="~y_pose" value="$(arg y_pos)"/>
+        <param name="~z_pose" value="$(arg z_pos)"/>
+    </node>
+
+
+</launch>
