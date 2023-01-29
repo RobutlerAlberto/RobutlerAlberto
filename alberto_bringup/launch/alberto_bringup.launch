@@ -13,7 +13,7 @@
     <param name="robot_description" command="$(find xacro)/xacro --inorder $(find alberto_description)/urdf/alberto.urdf.xacro" />
 
     <!-- Spawn the robot in gazebo -->
-    <include file="$(find alberto_bringup)/launch/alberto_spawn.launch">
+    <include file="$(find alberto_bringup)/include/alberto_spawn.launch">
         <arg name="x_pos" value="$(arg x_pos)"/>
         <arg name="y_pos" value="$(arg y_pos)"/>
         <arg name="z_pos" value="$(arg z_pos)"/>
