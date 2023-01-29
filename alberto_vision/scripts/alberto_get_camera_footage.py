@@ -9,6 +9,7 @@ import rospy
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
+import numpy as np
 
 class image:
 
@@ -29,15 +30,15 @@ class image:
 
         self.begin_image = True # After receiving first image will be forever true
 
-        img = self.bridge.imgmsg_to_cv2(image_msg,"passthrough")
         if self.camera_topic == "/depth_camera/depth/image_raw":
-            # normalize depth map (otherwise it's almost all white)
-            # img = img * (255.0/img.max())
-            img = cv2.normalize(img, None, 0, 1.0, cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+            img = self.bridge.imgmsg_to_cv2(image_msg,"32FC1")
+            cv2.normalize(img, img, 0, 255, cv2.NORM_MINMAX)
+            img = cv2.convertScaleAbs(img)
+        else:
+            img = self.bridge.imgmsg_to_cv2(image_msg,"bgr8")
 
         #! If I assign directly to cv_image key, it will show flickers of the non flipped image 
-        self.image_args["cv_image"] = img # encoding used to be 'bgr8'
-        # passthrough means wtv the encoding was before, it will be retained
+        self.image_args["cv_image"] = img
 
         # if self.camera_topic == "/depth_camera/depth/image_raw":
         #     rospy.loginfo(self.image_args["cv_image"])  
@@ -59,20 +60,3 @@ class image:
             rospy.signal_shutdown("Order to quit") # Stops ros
             exit()                                 # Exits python script
 
-
-# class pointcloud():
-#     def __init__(self):
-        
-#         self.depth_camera_topic = rospy.get_param("~camera_topic", default= "/depth_camera/depth/image_raw")
-#         self.pc_sub = rospy.Subscriber(self.camera_topic, Image, self.subscriberCallback)
-#         self.begin_pc = False
-#         self.depth_map = None
-
-#         # self.bridge = CvBridge()
-#         # self.image_args = {}
-
-#     def subscriberCallback(self,image_msg):
-
-#         self.begin_pc = True # after receiving first pointcloud will be forever True
-
-#         # self.image_args["cv_image"] = self.bridge.imgmsg_to_cv2(image_msg,"bgr8")

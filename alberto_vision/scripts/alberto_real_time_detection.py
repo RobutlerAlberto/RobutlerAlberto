@@ -67,7 +67,6 @@ def object_detection(rgb_camera, depth_map):
         # Stream read
         img = rgb_camera.image_args['cv_image']
         dm = depth_map.image_args['cv_image']
-        # cv2.imwrite('depth_map.png', dm)
 
         # Get shape
         height, width, _ = img.shape
@@ -109,32 +108,25 @@ def object_detection(rgb_camera, depth_map):
 
         font = cv2.FONT_HERSHEY_PLAIN
 
-        # new_boxes = []
         for i in range(len(boxes)):
 
             if i in indexes:
 
                 x, y, w, h = boxes[i]
-                # interest_area = dm[y:h, x:w]
+                interest_area = dm[y:(y+h), x:(x+w)]
 
-                dm = dm[~np.isnan(dm)]
-                rospy.loginfo(dm)
-                # dm = np.uint8(dm)
-                # rospy.loginfo(dm)
-                
-                # if (dm.all() and not np.isnan(np.sum(dm))): # and not is_plane(interest_area)):
-                #     rospy.loginfo(dm)
 
-                    # label = str(classes[class_ids[i]])
-                    # color = colors[i]
-                    # cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                    # cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
+                if not is_plane(interest_area):
+                    label = str(classes[class_ids[i]])
+                    color = colors[i]
+                    cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
         
         # ----------------------------------------------
         # Visualization
         # ----------------------------------------------
 
-        # rgb_camera.showImage(img)
+        rgb_camera.showImage(img)
 
 
 
