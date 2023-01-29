@@ -16,6 +16,7 @@ class image:
     def __init__(self, topic = "/depth_camera/color/image_raw"):
         
         # rospy.init_node('camera_footage', anonymous=False)
+        # self.camera_topic = rospy.get_param("~camera_topic", default= "/rrbot/camera1/image_raw")
         
         self.camera_topic = topic # rospy.get_param("~camera_topic", default= "/depth_camera/color/image_raw")
 
@@ -24,6 +25,7 @@ class image:
         self.image_sub = rospy.Subscriber(self.camera_topic, Image, self.subscriberCallback)
         self.image_args = {} # Contains cv_image
         self.begin_image = False
+
     
 
     def subscriberCallback(self, image_msg):

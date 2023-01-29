@@ -3,8 +3,13 @@
     <arg name="x_pos" default="-1.5"/>
     <arg name="y_pos" default="-4.0"/>
     <arg name="z_pos" default="0.0"/>
-    <arg name="controller" default="false" doc="Control the robot with a controller"/>
+    <arg name="controller" default="false" doc="control the robot with a controller"/>
+    <arg name="max_vel" default="0.4" doc="Limit the max velocity of the robot"/>
     <arg name="bagfile" default="false" doc="Test Robutler detection with a previously recorded bagfile"/>
+
+    <!-- Global veloctiy param  -->
+    <param name="/max_velocity" value="$(arg max_vel)"/>
+
     
     
     <!-- Upload robot description xacro to the ros param -->
@@ -12,7 +17,7 @@
 
     
     <!-- Spawn the robot in gazebo -->
-    <include file="$(find alberto_bringup)/launch/alberto_spawn.launch">
+    <include file="$(find alberto_bringup)/include/alberto_spawn.launch">
         <arg name="x_pos" value="$(arg x_pos)"/>
         <arg name="y_pos" value="$(arg y_pos)"/>
         <arg name="z_pos" value="$(arg z_pos)"/>
@@ -39,15 +44,21 @@
 
     <!-- Manual Controlling mode -->
     <include if="$(arg controller)" file="$(find alberto_bringup)/include/alberto_joy_teleop.launch"/>
-    
+
     <group unless="$(arg controller)">
         <node name="rqt_robot_steering" pkg="rqt_robot_steering" type="rqt_robot_steering" args="-t" output="screen"/>
     </group>   
+    
 
+    <!-- Yolo perception  -->
 
     <!-- Launch real time detection file -->
     <node pkg="alberto_vision" name="yolo_detection" type="alberto_real_time_detection.py" output="screen">
         <param name="~camera_topic" value="/depth_camera/color/image_raw"/>
     </node>
-    
+        
+    <!-- Navigation -->
+   <include file="$(find alberto_bringup)/include/alberto_navigation.launch">
+   </include> 
+
 </launch>
