@@ -115,8 +115,7 @@ def object_detection(rgb_camera, depth_map):
                 x, y, w, h = boxes[i]
                 interest_area = dm[y:(y+h), x:(x+w)]
 
-
-                if not is_plane(interest_area):
+                if interest_area.any() and not is_plane(interest_area):
                     label = str(classes[class_ids[i]])
                     color = colors[i]
                     cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
