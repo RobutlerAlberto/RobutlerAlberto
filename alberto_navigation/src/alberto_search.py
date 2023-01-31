@@ -3,7 +3,7 @@
 import math
 import rospy
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseWithCovarianceStamped
+from geometry_msgs.msg import PoseWithCovarianceStamped, Point32
 
 
 
@@ -60,6 +60,7 @@ class Search():
         self.searched_rooms = []
         self.current_coords = None
         self.coords_listener = self.init_listener()
+        self.coords_publisher = self.init_publisher()
     
     def reset(self):
         self.searched_rooms = []
@@ -76,8 +77,12 @@ class Search():
                     closest_room = room
         return closest_room
     
-    def go(self, coords):
-        pass
+    def go(self, coords): # publish to /goal_coords (geometry_msgs.msg Point32)
+        coords_msg = Point32(x=coords[0], y=coords[1], z=0)
+        self.coords_publisher.publish(coords_msg)
+        # coords_msg.x = coords[0]
+        # coords_msg.y = coords[1]
+        # coords_msg.z = 0
 
     def turn(self):
         return False # returns True if desired object is found
@@ -104,7 +109,7 @@ class Search():
             print('Robot doesn\'t know its own position yet, wait a bit!')
 
     def init_listener(self):
-        rospy.init_node('listener', anonymous=True)
+        rospy.init_node('coords_listener', anonymous=True)
         rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
         rospy.spin()
 
@@ -112,6 +117,12 @@ class Search():
         position = data.pose.pose.position
         self.current_coords = (position.x, position.y)
         rospy.loginfo(self.__str__())
+
+    def init_publisher(self):
+        rospy.loginfo('INIT PUBLISHER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        rospy.init_node('coords_publisher', anonymous=True)
+        pub = rospy.Publisher('/goal_coords', Point32, queue_size=10)
+        return pub
 
     def __str__(self):
         return "robot position: " + str(self.current_coords)
