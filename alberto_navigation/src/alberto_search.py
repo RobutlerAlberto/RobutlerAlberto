@@ -5,7 +5,7 @@ import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseWithCovarianceStamped, Point32
 from time import sleep
-
+from actionlib_msgs.msg import GoalStatusArray
 
 """
 entities present:
@@ -46,6 +46,7 @@ possible robot states, in order: (coords_listener / goal_listener / goal_publish
 
 class Search():
     def __init__(self):
+        rospy.init_node('alberto_search', anonymous=True)
         self.house_rooms = {
             # connections between rooms
             'connections': [
@@ -101,9 +102,10 @@ class Search():
         self.current_coords = None
         self.goal_reached = False
         self.goal_object = None
+        self.object_found = False
 
         self.coords_listener = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.coords_listener_callback)
-        self.goal_listener = None #! TODO
+        self.goal_listener = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
         self.mission_listener = None #! TODO
         self.goal_publisher = rospy.Publisher('/goal_coords', Point32, queue_size=10)
 
@@ -127,10 +129,10 @@ class Search():
             #     pass
             
             elif self.state == 'ready_for_turn':
-                # call turn()
-                pass
-            elif self.state == 'turning':
-                pass
+                self.turn()
+                
+            # elif self.state == 'turning':
+            #     pass
     
     # def reset(self):
     #     self.searched_rooms = []
@@ -152,10 +154,13 @@ class Search():
         coords_msg = Point32(x=coords[0], y=coords[1], z=0)
         self.coords_publisher.publish(coords_msg)
 
+    # def goalReachedCallback(self):
+    #     pass
+
     def turn(self):
         self.state = 'turning'
-        # if object found, do 'self.goal_reached = True' before returning
-        return False # returns True if desired object is found
+        # TODO: turning logic
+        # TODO: update self.object_found according to results
 
     def find_optimal_search_path(self):
         if self.current_coords: # if the robot doesn't know its own position yet, this function will be continuously called until it does
@@ -168,13 +173,8 @@ class Search():
                 path.append(new_room)
                 new_room_coords = self.house_rooms['coordinates'][new_room]
                 starting_coords = new_room_coords
-
             self.search_path = path
-        else:
-            #! don't know if this works but the intent was to have a 2 second delay between each call to this function
-            #! needs testing
-            sleep(2)
-
+            self.state = 'ready_for_next_stop'
 
             # start_room = self.find_closest_room(self.current_coords)
             # start_room_coords = self.house_rooms['coordinates'][start_room]
@@ -193,6 +193,15 @@ class Search():
             #     else:
             #         break
 
+        else:
+            #! don't know if this works but the intent was to have a 2 second delay between each call to this function
+            #! needs testing
+            sleep(2)
+ 
+
+    def init_listener(self):
+        rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
+
     # def init_listener(self):
     #     rospy.loginfo('INIT SUBSCRIBER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     #     sub = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
@@ -204,12 +213,23 @@ class Search():
         # rospy.loginfo('CALLBACK CALLBACK CALLBACK')
         # rospy.loginfo(self.__str__())
 
-    def goal_listener_callback(self):
-        self.goal_reached = True
-        if len(self.search_path == 0):
-            self.state = '' #! TODO
-        else:
-            self.state = 'ready_for_next_stop'
+
+    def goal_listener_callback(self,data):
+        try:
+            goal_status_int = data.status_list[0].status    #* 1 for active, 3 for completed with success
+        except:
+            self.goal_reached = False
+            return
+        
+        if goal_status_int == 3 :
+            self.goal_reached = True
+            if len(self.search_path == 0):
+                self.state = 'ready_for_turn'
+            else:
+                self.state = 'ready_for_next_stop'
+        elif goal_status_int == 1 :
+        # else :  #! This makes it so unless the goal is reached with success, this atribute  is always false, not sure which line is more adequate
+            self.goal_reached = False
 
     def mission_listener_callback(self, data):
         #! TODO: setup mission from data
