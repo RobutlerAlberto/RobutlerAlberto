@@ -70,4 +70,10 @@
     <node pkg="alberto_navigation" name="alberto_search" type="alberto_search.py"
         output="screen" />
 
+
+    <!-- Mission handler  -->
+    <node pkg="alberto_missions" type="alberto_mission_handler.py" name="alberto_mission_handler">
+        
+    </node>
+
 </launch>

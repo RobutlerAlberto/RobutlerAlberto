@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /InteractiveMarkers1
       Splitter Ratio: 0.9134860038757324
     Tree Height: 329
   - Class: rviz/Selection
@@ -268,6 +269,15 @@ Visualization Manager:
       Topic: /move_base/global_costmap/footprint
       Unreliable: false
       Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /menu/update
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -296,7 +306,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.494166612625122
+      Distance: 6.087225437164307
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -304,17 +314,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -0.34455713629722595
-        Y: -2.4111762046813965
-        Z: -1.0427590608596802
+        X: -0.8273818492889404
+        Y: -4.102470874786377
+        Z: -1.0443931818008423
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 1.2197965383529663
       Target Frame: odom
-      Yaw: 4.813179969787598
+      Yaw: 4.693179130554199
     Saved:
       - Angle: 0.06500005722045898
         Class: rviz/TopDownOrtho
