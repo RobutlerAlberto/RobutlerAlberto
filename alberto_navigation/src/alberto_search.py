@@ -4,11 +4,13 @@ import math
 import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import PoseWithCovarianceStamped, Point32
+from actionlib_msgs.msg import GoalStatusArray
 
 
 
 class Search():
     def __init__(self):
+        rospy.init_node('alberto_search', anonymous=True)
         self.house_rooms = {
             # connections between rooms
             'connections': [
@@ -59,8 +61,11 @@ class Search():
         }
         self.searched_rooms = []
         self.current_coords = None
-        self.coords_listener = self.init_listener()
+        self.coords_listener = self.init_listener() # bruno- This method doesn't return anything, isn't this atribute null?
+
         self.coords_publisher = self.init_publisher()
+        self.init_goal_status_subscriber() # bruno - This method doesn't return anything so I didnt assign it to any class atribute
+        rospy.spin()   # bruno - Moved this out of the methods above so that its more clear when the spin is done
     
     def reset(self):
         self.searched_rooms = []
@@ -83,6 +88,9 @@ class Search():
         # coords_msg.x = coords[0]
         # coords_msg.y = coords[1]
         # coords_msg.z = 0
+
+    def goalReachedCallback(self):
+        pass
 
     def turn(self):
         return False # returns True if desired object is found
@@ -108,10 +116,32 @@ class Search():
         else:
             print('Robot doesn\'t know its own position yet, wait a bit!')
 
+    def init_goal_status_subscriber(self):
+        rospy.Subscriber("/move_base/status",GoalStatusArray,self.goalStatusCallback)
+
+
+
+    def goalStatusCallback(self,data):
+        try:
+            goal_status_int = data.status_list[0].status    #* 1 for active, 3 for completed with success
+        except:
+            self.goal_completed = False
+            return
+        # rospy.loginfo(goal_status_int)
+        
+        if goal_status_int == 3 :
+            self.goal_completed = True
+        elif goal_status_int == 1 :
+        # else :  #! This makes it so unless the goal is reached with success, this atribute  is always false, not sure which line is more adequate
+            self.goal_completed = False
+
+        # rospy.loginfo(self.goal_completed)
+ 
+        
+
+
     def init_listener(self):
-        rospy.init_node('coords_listener', anonymous=True)
-        rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
-        rospy.spin()
+        rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
 
     def listener_callback(self, data):
         position = data.pose.pose.position
@@ -120,7 +150,7 @@ class Search():
 
     def init_publisher(self):
         rospy.loginfo('INIT PUBLISHER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        rospy.init_node('coords_publisher', anonymous=True)
+        # rospy.init_node('coords_publisher', anonymous=True)
         pub = rospy.Publisher('/goal_coords', Point32, queue_size=10)
         return pub
 
