@@ -72,7 +72,7 @@
 
 
     <!-- Mission handler  -->
-    <node pkg="alberto_missions" type="alberto_mission_handler.py" name="alberto_mission_handler">
+    <node pkg="alberto_missions" type="alberto_mission_handler.py" name="alberto_mission_handler" output="screen">
         
     </node>
 
