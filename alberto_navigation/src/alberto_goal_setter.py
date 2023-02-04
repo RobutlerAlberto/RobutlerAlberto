@@ -29,6 +29,7 @@ def main():
     # Processing
     #-----------------------------
     rospy.spin()
+
     
 
 def coordsReceivedCallback(message, **kwargs):

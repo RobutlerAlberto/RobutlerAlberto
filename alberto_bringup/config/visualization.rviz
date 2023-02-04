@@ -6,6 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
+        - /InteractiveMarkers1
       Splitter Ratio: 0.9134860038757324
     Tree Height: 329
   - Class: rviz/Selection
@@ -25,7 +26,7 @@ Panels:
   - Class: rviz/Time
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud
+    SyncSource: RGB_image
 Preferences:
   PromptSaveOnExit: true
 Toolbars:
@@ -187,7 +188,7 @@ Visualization Manager:
           Scale: 1
           Value: true
         Value: true
-      Enabled: true
+      Enabled: false
       Head Length: 0.30000001192092896
       Head Radius: 0.10000000149011612
       Name: PoseWithCovariance
@@ -197,7 +198,7 @@ Visualization Manager:
       Shape: Arrow
       Topic: /amcl_pose
       Unreliable: false
-      Value: true
+      Value: false
     - Alpha: 1
       Arrow Length: 0.30000001192092896
       Axes Length: 0.30000001192092896
@@ -259,6 +260,24 @@ Visualization Manager:
       Unreliable: false
       Use Timestamp: false
       Value: false
+    - Alpha: 1
+      Class: rviz/Polygon
+      Color: 25; 255; 0
+      Enabled: true
+      Name: Polygon
+      Queue Size: 10
+      Topic: /move_base/global_costmap/footprint
+      Unreliable: false
+      Value: true
+    - Class: rviz/InteractiveMarkers
+      Enable Transparency: true
+      Enabled: true
+      Name: InteractiveMarkers
+      Show Axes: false
+      Show Descriptions: true
+      Show Visual Aids: false
+      Update Topic: /menu/update
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -287,7 +306,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 9.321187019348145
+      Distance: 3.6504807472229004
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -295,17 +314,17 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -2.7528128623962402
-        Y: -3.8950676918029785
-        Z: -1.0439934730529785
+        X: -1.68934166431427
+        Y: -3.5681862831115723
+        Z: -0.8548570871353149
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 1.2197965383529663
       Target Frame: odom
-      Yaw: 4.813179969787598
+      Yaw: 4.693179130554199
     Saved:
       - Angle: 0.06500005722045898
         Class: rviz/TopDownOrtho
