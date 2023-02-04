@@ -12,7 +12,8 @@
        <arg name="_base_frame" default="base_footprint"/> 
     </node> -->
 
-    <arg name="map_file" default="$(find alberto_navigation)/maps/apartment_map_1.yaml"/>
+    <!-- <arg name="map_file" default="$(find alberto_navigation)/maps/apartment_map_1.yaml"/> -->
+    <arg name="map_file" default="$(find alberto_navigation)/maps/apartment_map_2.yaml"/>
     <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)">
     </node>
 

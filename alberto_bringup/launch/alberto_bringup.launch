@@ -67,8 +67,8 @@
     <include file="$(find alberto_bringup)/include/alberto_navigation.launch" />
 
     <!-- Search -->
-    <node pkg="alberto_navigation" name="alberto_search" type="alberto_search.py"
-        output="screen" />
+    <node pkg="alberto_navigation" name="alberto_search" type="alberto_search.py" output="screen"></node>
+
 
 
     <!-- Mission handler  -->
