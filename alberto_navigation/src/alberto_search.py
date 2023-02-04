@@ -2,7 +2,7 @@
 
 import math
 import rospy
-from std_msgs.msg import String
+from std_msgs.msg import String,Int16
 from geometry_msgs.msg import PoseWithCovarianceStamped, Point32
 from time import sleep
 from actionlib_msgs.msg import GoalStatusArray
@@ -100,16 +100,16 @@ class Search():
         
         # rospy.init_node('search_pubsub', anonymous=True)
         self.current_coords = None
-        self.goal_reached = False
-        self.goal_object = None
-        self.object_found = False
-        self.final_stop = False
-        self.finish = False
+        self.goal_reached   = False
+        self.goal_object    = None
+        self.object_found   = False
+        self.final_stop     = False
+        self.finish         = False
 
-        self.coords_listener = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.coords_listener_callback)
-        self.goal_listener = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
-        self.mission_listener = None #! TODO
-        self.goal_publisher = rospy.Publisher('/goal_coords', Point32, queue_size=10)
+        self.coords_listener    = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.coords_listener_callback)
+        self.goal_listener      = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
+        self.mission_listener   = rospy.Subscriber("/active_mission_ID",Int16,self.mission_listener_callback)
+        self.goal_publisher     = rospy.Publisher('/goal_coords', Point32, queue_size=10)
 
         self.state = 'dormant'
         self.run()
@@ -243,8 +243,19 @@ class Search():
     def mission_listener_callback(self, data):
         #! TODO: setup mission from data
         self.goal_reached = False
-        # self.goal_object = ...  
+
+        if data == 20:
+            self.mission_descrition = "search_pink_ball_in_house"
+            self.goal_object = "single_pink_ball"
+        elif data == 23:
+            self.mission_descrition = "check_if_someone_is_home"
+            self.goal_object = "single_person"
+        elif data == 24:
+            self.mission_descrition = "count_num_of_cubes_in_house"
+            self.goal_object = "count_blue_cubes"
+
         self.state = 'ready_for_path'
+
 
     # def init_publisher(self):
     #     rospy.loginfo('INIT PUBLISHER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
