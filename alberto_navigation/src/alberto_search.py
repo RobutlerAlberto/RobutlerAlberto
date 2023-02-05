@@ -3,7 +3,7 @@
 import math
 import rospy
 from std_msgs.msg import String,Int16
-from geometry_msgs.msg import PoseWithCovarianceStamped, Point32
+from geometry_msgs.msg import PoseWithCovarianceStamped, Point
 from time import sleep
 from actionlib_msgs.msg import GoalStatusArray
 
@@ -105,11 +105,12 @@ class Search():
         self.object_found   = False
         self.final_stop     = False
         self.finish         = False
+        self.mission_active = False
 
         self.coords_listener    = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.coords_listener_callback)
         self.goal_listener      = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
         self.mission_listener   = rospy.Subscriber("/active_mission_ID",Int16,self.mission_listener_callback)
-        self.goal_publisher     = rospy.Publisher('/goal_coords', Point32, queue_size=10)
+        self.goal_publisher     = rospy.Publisher('/goal_coords', Point, queue_size=10)
 
         self.state = 'dormant'
         self.run()
@@ -118,6 +119,9 @@ class Search():
         while not rospy.is_shutdown():
             # if self.state == 'dormant':
             #     pass
+            # rospy.loginfo(self.state)
+            #! Temp sleep
+            rospy.sleep(1)
             if self.state == 'ready_for_path':
                 self.find_optimal_search_path()
             elif self.state == 'ready_for_next_stop':
@@ -137,8 +141,7 @@ class Search():
             #     pass
 
             if self.finish:
-                return self.object_found
-    
+                self.state = 'dormant'
     # def reset(self):
     #     self.searched_rooms = []
 
@@ -157,26 +160,31 @@ class Search():
             room = conn[0] if conn[1]==current_room else conn[1] # room we might potentially go to
             if room not in searched_rooms:
                 x2, y2 = self.house_rooms['coordinates'][room]
-                d = math.sqrt((x2[0]-x1[0])**2 + (y2[1]-y1[1])**2)
+                # d = math.sqrt((x2[0]-x1[0])**2 + (y2[1]-y1[1])**2)
+                d = math.sqrt((x2-x1)**2 + (y2-y1)**2)
                 if d < min_d:
                     min_d = d
                     closest_room = room
         return closest_room
     
-    def go(self, coords): # publish to /goal_coords (geometry_msgs.msg Point32)
+    def go(self, coords): # publish to /goal_coords (geometry_msgs.msg Point)
         self.state = 'travelling'
-        coords_msg = Point32(x=coords[0], y=coords[1], z=0)
-        self.coords_publisher.publish(coords_msg)
+        coords_msg = Point(x=coords[0], y=coords[1], z=0)
+        self.goal_publisher.publish(coords_msg)
 
     # def goalReachedCallback(self):
     #     pass
 
     def turn(self):
         self.state = 'turning'
+        rospy.loginfo(self.state)
+        rospy.sleep(1)
+        self.state = 'ready_for_next_stop'
         # TODO: turning logic
         # TODO: update self.object_found according to results
         if self.final_stop:
             self.finish = True
+            self.mission_active = False
 
     def find_optimal_search_path(self):
         if self.current_coords: # if the robot doesn't know its own position yet, this function will be continuously called until it does
@@ -190,6 +198,7 @@ class Search():
                 new_room_coords = self.house_rooms['coordinates'][new_room]
                 starting_coords = new_room_coords
             self.search_path = path
+            rospy.loginfo(self.search_path)
             self.state = 'ready_for_next_stop'
 
             # start_room = self.find_closest_room(self.current_coords)
@@ -212,7 +221,7 @@ class Search():
         else:
             #! don't know if this works but the intent was to have a 2 second delay between each call to this function
             #! needs testing
-            sleep(2) # rospy.sleep
+            rospy.sleep(2) # rospy.sleep
  
 
     def init_listener(self):
@@ -231,6 +240,10 @@ class Search():
 
 
     def goal_listener_callback(self,data):
+        
+        if not self.mission_active:
+            return
+
         try:
             goal_status_int = data.status_list[0].status    #* 1 for active, 3 for completed with success
         except:
@@ -239,8 +252,11 @@ class Search():
         
         if goal_status_int == 3:
             self.goal_reached = True
-            self.state = 'ready_for_turn'
-            if len(self.search_path == 0):
+            
+            # Should only transition to ready for turn if its traveling
+            self.state = 'ready_for_turn' if self.state == 'travelling' else self.state 
+
+            if len(self.search_path) == 0:
                 self.final_stop = True
             #     self.state = 'ready_for_turn'
             # else:
@@ -253,22 +269,32 @@ class Search():
         #! TODO: setup mission from data
         self.goal_reached = False
 
+        data = data.data
+        
         if data == 20:
             self.mission_description = "search_pink_ball_in_house"
             self.goal_object = "single_pink_ball"
+            self.mission_active = True
+            self.state = 'ready_for_path'
+            
         elif data == 23:
             self.mission_description = "check_if_someone_is_home"
             self.goal_object = "single_person"
+            self.mission_active = True
+            self.state = 'ready_for_path'
+            
         elif data == 24:
             self.mission_description = "count_num_of_cubes_in_house"
             self.goal_object = "count_blue_cubes"
+            self.mission_active = True
+            self.state = 'ready_for_path'
+            
 
-        self.state = 'ready_for_path'
 
 
     # def init_publisher(self):
     #     rospy.loginfo('INIT PUBLISHER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    #     pub = rospy.Publisher('/goal_coords', Point32, queue_size=10)
+    #     pub = rospy.Publisher('/goal_coords', Point, queue_size=10)
     #     return pub
 
     def __str__(self):
