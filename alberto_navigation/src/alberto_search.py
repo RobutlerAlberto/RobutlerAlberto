@@ -142,10 +142,19 @@ class Search():
     # def reset(self):
     #     self.searched_rooms = []
 
+    #! TODO
+    def find_room_by_coords(self, coords):
+        pass
+
     def find_closest_room(self, coords, searched_rooms):
         x1, y1 = coords
         min_d, closest_room = float('inf'), None
-        for room in self.house_rooms['coordinates']:
+        current_room = self.find_room_by_coords(coords)
+
+        # connections in which the current room is involved
+        connections = [conn for conn in self.house_rooms['connections'] if (conn[0]==current_room or conn[1]==current_room)]
+        for conn in connections:
+            room = conn[0] if conn[1]==current_room else conn[1] # room we might potentially go to
             if room not in searched_rooms:
                 x2, y2 = self.house_rooms['coordinates'][room]
                 d = math.sqrt((x2[0]-x1[0])**2 + (y2[1]-y1[1])**2)
@@ -245,13 +254,13 @@ class Search():
         self.goal_reached = False
 
         if data == 20:
-            self.mission_descrition = "search_pink_ball_in_house"
+            self.mission_description = "search_pink_ball_in_house"
             self.goal_object = "single_pink_ball"
         elif data == 23:
-            self.mission_descrition = "check_if_someone_is_home"
+            self.mission_description = "check_if_someone_is_home"
             self.goal_object = "single_person"
         elif data == 24:
-            self.mission_descrition = "count_num_of_cubes_in_house"
+            self.mission_description = "count_num_of_cubes_in_house"
             self.goal_object = "count_blue_cubes"
 
         self.state = 'ready_for_path'
