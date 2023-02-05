@@ -49,29 +49,143 @@ class Search():
         rospy.init_node('alberto_search', anonymous=True)
         self.house_rooms = {
             # connections between rooms
-            'connections': [
-                # (R1, R2, distance)
-                ('bedroom1L', 'bedroom1R', 2.52),
-                ('bedroom1R', 'hall1', 1.58),
-                ('bedroom2T', 'bedroom2B', 2.28),
-                ('bedroom2B', 'hall1', 2.51), 
-                ('bedroom2B', 'hall2', 3.53), 
-                ('bedroom3T', 'bedroom3B', 1.70), 
-                ('bedroom3B', 'hall2', 2.16), 
-                ('toilet1', 'hall2', 1.40), 
-                ('vestibule', 'hall2', 2.20), 
-                ('toilet2', 'vestibule', 1.37), 
-                ('dining_room', 'hall1', 2.45), 
-                ('dining_room', 'kitchen', 2.59), 
-                ('dining_room', 'terraceT', 3.03), 
-                ('terraceT', 'terraceB', 4.61), 
-                ('terraceB', 'living_roomL', 1.60), 
-                ('living_roomL', 'living_roomM', 2.04), 
-                ('living_roomM', 'living_roomR', 2.45), 
-                ('dining_room', 'living_roomL', 1.92), 
-                ('dining_room', 'living_roomM', 2.07), 
-                ('living_roomR', 'vestibule', 3.10)
-            ],
+            'connections' : {
+                'bedroom1L' : {
+                    'bedroom1L': 0,
+                    'bedroom1R': 2.52
+                },
+                'bedroom1R': {
+                    'bedroom1L': 2.52,
+                    'bedroom1R': 0,
+                    'hall1': 1.58
+                },
+                'bedroom2T' : {
+                    'bedroom2T': 0,
+                    'bedroom2B': 2.28
+                },
+                'bedroom2B' : {
+                    'bedroom2B': 0,
+                    'bedroom2T': 2.28,
+                    'hall1': 2.51,
+                    'hall2': 3.53
+                },
+                'bedroom3T': {
+                    'bedroom3T': 0,
+                    'bedroom3B': 1.70
+                },
+                'bedroom3B': {
+                    'bedroom3B': 0,
+                    'bedroom3T': 1.70,
+                    'hall2': 2.16
+                },
+                'hall1': {
+                    'hall1': 0,
+                    'bedroom1R': 1.58,
+                    'bedroom2B': 2.51,
+                    'dining_room': 2.45
+                },
+                'hall2': {
+                    'hall2': 0,
+                    'bedroom2B': 3.53,
+                    'bedroom3B': 2.16,
+                    'toilet1': 1.40,
+                    'vestibule': 2.20
+                },
+                'toilet1': {
+                    'toilet1': 0,
+                    'hall2': 1.40
+                },
+                'toilet2': {
+                    'toilet2': 0,
+                    'vestibule': 1.37
+                },
+                'vestibule': {
+                    'vestibule': 0,
+                    'hall2': 2.20,
+                    'toilet2': 1.37,
+                    'living_roomR': 3.10
+                },
+                'dining_room': {
+                    'dining_room': 0,
+                    'hall1': 2.45,
+                    'kitchen': 2.59,
+                    'living_roomL': 1.92,
+                    'living_roomM': 2.07,
+                    'terraceT': 3.03
+                },
+                'terraceT': {
+                    'terraceT': 0,
+                    'dining_room': 3.03,
+                    'terraceB': 4.61
+                },
+                'terraceB': {
+                    'terraceB': 0,
+                    'terraceT': 4.61,
+                    'living_roomL': 1.60
+                },
+                'living_roomL': {
+                    'living_roomL': 0,
+                    'terraceB': 1.60,
+                    'living_roomM': 2.04,
+                    'dining_room': 1.92
+                },
+                'living_roomM': {
+                    'living_roomM': 0,
+                    'living_roomL': 2.04,
+                    'living_roomR': 2.45,
+                    'dining_room': 2.07
+                },
+                'living_roomR': {
+                    'living_roomR': 0,
+                    'living_roomM': 2.45,
+                    'vestibule': 3.10
+                },
+                'kitchen': {
+                    'kitchen': 0,
+                    'dining_room': 2.59
+                }
+            },
+            # 'connections': [
+            #     # (R1, R2, distance)
+            #     ('bedroom1L', 'bedroom1L', 0),
+            #     ('bedroom1R', 'bedroom1R', 0),
+            #     ('bedroom2T', 'bedroom2T', 0),
+            #     ('bedroom2B', 'bedroom2B', 0),
+            #     ('hall1', 'hall1', 0),
+            #     ('hall2', 'hall2', 0),
+            #     ('bedroom3T', 'bedroom3T', 0),
+            #     ('bedroom3B', 'bedroom3B', 0),
+            #     ('toilet1', 'toilet1', 0),
+            #     ('vestibule', 'vestibule', 0),
+            #     ('toilet2', 'toilet2', 0),
+            #     ('dining_room', 'dining_room', 0),
+            #     ('terraceT', 'terraceT', 0),
+            #     ('terraceB', 'terraceB', 0),
+            #     ('living_roomL', 'living_roomL', 0),
+            #     ('living_roomM', 'living_roomM', 0),
+            #     ('living_roomR', 'living_roomR', 0),
+            #     ('kitchen', 'kitchen', 0),
+            #     ('bedroom1L', 'bedroom1R', 2.52),
+            #     ('bedroom1R', 'hall1', 1.58),
+            #     ('bedroom2T', 'bedroom2B', 2.28),
+            #     ('bedroom2B', 'hall1', 2.51), 
+            #     ('bedroom2B', 'hall2', 3.53), 
+            #     ('bedroom3T', 'bedroom3B', 1.70), 
+            #     ('bedroom3B', 'hall2', 2.16), 
+            #     ('toilet1', 'hall2', 1.40), 
+            #     ('vestibule', 'hall2', 2.20), 
+            #     ('toilet2', 'vestibule', 1.37), 
+            #     ('dining_room', 'hall1', 2.45), 
+            #     ('dining_room', 'kitchen', 2.59), 
+            #     ('dining_room', 'terraceT', 3.03), 
+            #     ('terraceT', 'terraceB', 4.61), 
+            #     ('terraceB', 'living_roomL', 1.60), 
+            #     ('living_roomL', 'living_roomM', 2.04), 
+            #     ('living_roomM', 'living_roomR', 2.45), 
+            #     ('dining_room', 'living_roomL', 1.92), 
+            #     ('dining_room', 'living_roomM', 2.07), 
+            #     ('living_roomR', 'vestibule', 3.10)
+            # ],
             # coordinates of each room
             'coordinates': {
                 # R: (x, y)
@@ -145,26 +259,36 @@ class Search():
     # def reset(self):
     #     self.searched_rooms = []
 
-    #! TODO
-    def find_room_by_coords(self, coords):
-        pass
+    # #! TODO
+    # def find_room_by_coords(self, coords):
+
+    #     pass
 
     def find_closest_room(self, coords, searched_rooms):
         x1, y1 = coords
         min_d, closest_room = float('inf'), None
-        current_room = self.find_room_by_coords(coords)
+        # current_room = self.find_room_by_coords(coords)
+
+        current_room_d, current_room = float('inf'), None
+        for room, room_coords in self.house_rooms['coordinates']:
+            d = math.sqrt((room_coords[0]-x1)**2 + (room_coords[1]-y1)**2)
+            if d < current_room_d:
+                current_room_d = d
+                current_room = room
 
         # connections in which the current room is involved
-        connections = [conn for conn in self.house_rooms['connections'] if (conn[0]==current_room or conn[1]==current_room)]
-        for conn in connections:
-            room = conn[0] if conn[1]==current_room else conn[1] # room we might potentially go to
-            if room not in searched_rooms:
-                x2, y2 = self.house_rooms['coordinates'][room]
-                # d = math.sqrt((x2[0]-x1[0])**2 + (y2[1]-y1[1])**2)
-                d = math.sqrt((x2-x1)**2 + (y2-y1)**2)
-                if d < min_d:
-                    min_d = d
-                    closest_room = room
+        # connections = [conn for conn in self.house_rooms['connections'] if (conn[0]==current_room or conn[1]==current_room)]
+        connections = self.house_rooms['connections'][current_room]
+        for room, d in connections:
+            # room = conn[0] if conn[1]==current_room else conn[1] # room we might potentially go to
+            if room not in searched_rooms and d < min_d:
+                #! this could be simplified by using the distances from the dict
+                # x2, y2 = self.house_rooms['coordinates'][room]
+                # d = math.sqrt((x2-x1)**2 + (y2-y1)**2)
+                # d = self.house_rooms['connections']
+                # if d < min_d:
+                min_d = d
+                closest_room = room
         return closest_room
     
     def go(self, coords): # publish to /goal_coords (geometry_msgs.msg Point)
