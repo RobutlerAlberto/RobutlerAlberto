@@ -306,7 +306,11 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
+<<<<<<< HEAD
       Distance: 7.9774088859558105
+=======
+      Distance: 7.20540189743042
+>>>>>>> alberto_missions
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -314,9 +318,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: -1.6129709482192993
-        Y: -3.3257412910461426
-        Z: -0.765562117099762
+        X: -0.1365707814693451
+        Y: -1.6849285364151
+        Z: -0.15448538959026337
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

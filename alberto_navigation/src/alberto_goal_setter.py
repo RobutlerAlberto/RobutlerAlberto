@@ -4,8 +4,9 @@ import rospy
 
 from functools import partial
 
-from std_msgs.msg import Header
+from std_msgs.msg import Header,Bool
 from geometry_msgs.msg import PoseStamped,Point 
+from actionlib_msgs.msg import GoalID
 
 
 def main():
@@ -14,13 +15,21 @@ def main():
     #-----------------------------
     rospy.init_node("alberto_goal_setter",anonymous=False)
     goal_coords_topic = rospy.param = rospy.get_param("/goal_coords_topic", default="/goal_coords")
+    goal_cancel_topic = rospy.get_param("/goal_cancel_cmd",default="/goal_cancel")
+    
 
     kwargs = {}
     kwargs["goal_pub"] = rospy.Publisher("/move_base_simple/goal",PoseStamped,queue_size = 10)
+    kwargs["cancel_pub"] = rospy.Publisher("/move_base/cancel",GoalID,queue_size = 10)
 
     # Defining partials
     coordsReceivedCallbackPart = partial(coordsReceivedCallback,**kwargs)
+    cancelGoalCallbackPart = partial(cancelGoalCallback,**kwargs)
+
     goal_coords_sub = rospy.Subscriber(goal_coords_topic,Point,coordsReceivedCallbackPart) 
+    goal_cancel_sub = rospy.Subscriber(goal_cancel_topic,Bool,cancelGoalCallbackPart) 
+
+
 
     rate = rospy.Rate(10)
 
@@ -60,8 +69,16 @@ def coordsReceivedCallback(message, **kwargs):
     # Publishing goal message
     kwargs["goal_pub"].publish(goal_message)
 
-def cancelGoalCallback(message):
-    pass
+def cancelGoalCallback(message,**kwargs):
+
+    # If cancel is false return
+    if not message.data:
+        return 
+
+    cancel_msg = GoalID()
+    cancel_msg.id = ''
+    kwargs['cancel_pub'].publish(cancel_msg)
+
 
 
 if __name__=="__main__":
