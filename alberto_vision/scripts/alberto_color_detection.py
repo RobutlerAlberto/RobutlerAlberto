@@ -42,8 +42,8 @@ class ColorDetection:
         self.max_distance = 100
 
         # Define the color boundaries in the HSV color space for red
-        # self.lower_red = np.array([0,50,50])
-        # self.upper_red = np.array([10,255,255])
+        self.lower_red = np.array([0,50,50])
+        self.upper_red = np.array([10,255,255])
 
         # # Define the color boundaries in the HSV color space for green
         # self.lower_green = np.array([40,50,50])
@@ -115,13 +115,15 @@ class ColorDetection:
                 if cv2.contourArea(cnt) < self.min_contour_size:
                     continue
                 hull = cv2.convexHull(cnt)
+                
                 if cv2.contourArea(cnt) not in self.detected_contours:
                     self.detected_contours.append(cv2.contourArea(cnt))
                     # Uncomment to draw contours
                     # cv2.drawContours(img,[hull],0,(0,255,0),2)
 
-            # Compute the centroid of the current contour
+                # Compute the centroid of the current contour
                 M = cv2.moments(cnt)
+
                 if M["m00"] != 0:
                     cX = int(M["m10"] / M["m00"])
                     cY = int(M["m01"] / M["m00"])
@@ -188,9 +190,9 @@ class ColorDetection:
         upper_bound = None
 
         # Define boundaries for the requested color
-        # if self.color == 'red':
-        #     lower_bound = self.lower_red
-        #     upper_bound = self.upper_red
+        if self.color == 'red':
+            lower_bound = self.lower_red
+            upper_bound = self.upper_red
 
         # if self.color == 'green':
         #     lower_bound = self.lower_green
@@ -223,8 +225,12 @@ class ColorDetection:
         if mission_id_msg.data == 24:
             self.color = 'blue'
 
+        # Defines color as per the mission requirements to find blue cubes
+        if mission_id_msg.data == 25:
+            self.color = 'red'
+
         # If the mission ID it not one relevant to this code, reset variables
-        if mission_id_msg.data not in (24, 20):
+        if mission_id_msg.data not in (20, 24, 25):
             self.color = None
             self.centroids =  {}
 

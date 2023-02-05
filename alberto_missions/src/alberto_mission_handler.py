@@ -103,11 +103,14 @@ class MissionHandler():
         ("go_to_living_room" , 10),
         ("go_to_terrace"     , 11),
         # Passive
-        ("search_pink_ball_in_house"     , 20),
-        ("check_if_table_free"           , 21),
-        ("take_photograph"               , 22),
-        ("check_if_someone_is_home"      , 23),
-        ("count_num_of_cubes_in_house"   , 24),
+        ("search_pink_ball_in_house"          , 20),
+        ("check_if_table_free"                , 21),
+        ("take_photograph"                    , 22),
+        ("check_if_someone_is_home"           , 23),
+        ("count_num_of_blue_cubes_in_house"   , 24),
+        ("search_red_ball_in_house"           , 25), #! Por implementar
+        ("search_computer"                    , 26), #! Por implementar
+        ("see_if_table_is_empty"              , 27), #! Por implementar
         
         #Active
         ("touch_person"      , 30)
