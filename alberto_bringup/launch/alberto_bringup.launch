@@ -63,6 +63,9 @@
         <param name="~camera_topic" value="/depth_camera/color/image_raw" />
     </node>
 
+    <!-- Launch color detection file -->    
+    <node pkg="alberto_vision" name="alberto_color_detection" type="alberto_color_detection.py" output="screen"></node>
+
     <!-- Navigation -->
     <include file="$(find alberto_bringup)/include/alberto_navigation.launch" />
 

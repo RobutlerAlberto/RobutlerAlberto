@@ -30,7 +30,7 @@ class ObjectDetection:
 
     def __init__(self):
         # Listens for the mission ID
-        mission_listener = rospy.Subscriber("/active_mission_ID", Int16, self.mission_listener_callback)
+        rospy.Subscriber("/active_mission_ID", Int16, self.mission_listener_callback)
 
 
         rospy.init_node('camera_footage', anonymous=False)
@@ -39,6 +39,7 @@ class ObjectDetection:
         self.depth_map = image("/depth_camera/depth/image_raw")
 
         self.object = None
+        self.object_2 = None
 
         self.found = False
         # Starts function with necessary args
@@ -59,6 +60,7 @@ class ObjectDetection:
 
         #? This part detects objects and connects the identifiers to the object's bounding boxes
         classes = []
+
 
         with open(path + r"/coco.names", "r") as f:
             classes = [line.strip() for line in f.readlines()]
@@ -130,21 +132,37 @@ class ObjectDetection:
                         label = str(classes[class_ids[i]])
                         color = colors[i]
                         self.found = False
-                        if label == ('tvmonitor' or self.object):
-                            cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                            cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
-                            # print(self.object + ' found')
+                        if self.object_2:
+                            if label == (self.object_2 or self.object):
+                                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                                cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
+                                # print(self.object + ' found')
+                        else:        
+                            if label == self.object:
+                                print('looking for sum bitches')
+                                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                                cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
+                                # print(self.object + ' found')
+
             # ----------------------------------------------
             # Visualization
             # ----------------------------------------------
             self.rgb_camera.showImage(img)
 
     def mission_listener_callback(self, mission_id_msg):
+            # Checks mission ID to detect computers
             if mission_id_msg.data == 26:
                 self.object = 'laptop'
+                self.object_2 = 'tv_monitor'
+            
+            # Checks mission ID to detect persons            
+            if mission_id_msg.data == 24:
+                self.object = 'person'
+                self.object_2 = None
 
-            if not mission_id_msg.data == 26:
+            if mission_id_msg.data not in (24,26):
                 self.object = None
+                self.object_2 = None
 
 if __name__ == "__main__":
     ObjectDetection()
