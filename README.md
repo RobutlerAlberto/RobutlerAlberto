@@ -30,7 +30,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/RobutlerAlberto/RobutlerAlberto">
-    <img src="docs/robutler.jpg" alt="Logo" width="450" height="350">
+    <img src="/docs/robutler.jpg" alt="Logo" width="450" height="350">
   </a>
 
 <h3 align="center">Robutler Alberto</h3>
