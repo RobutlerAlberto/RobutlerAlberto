@@ -104,7 +104,7 @@ def main():
         
         mission.run()
         rospy.sleep(1)
-        
+        rospy.loginfo(mission.status) 
         #! If this if is below, it would evaluate false if the global status was false and and goal aborted were true
         if mission.nav_goal_aborted:
             mission.cancelMission() #Cancels navgoal
