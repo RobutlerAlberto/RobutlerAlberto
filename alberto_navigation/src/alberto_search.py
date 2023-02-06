@@ -334,14 +334,14 @@ class Search():
 
     def turn(self):
         self.state = 'turning'
-        margin = 5
+        margin = 30 * math.pi/180
         while not self.current_orientation:
             pass
 
         turning = False
         init_orient = self.current_orientation[2] if (self.current_orientation[2]>0) else (2*math.pi + self.current_orientation[2]) # z value (0 to 2*pi)
 
-        while True:
+        while not rospy.is_shutdown():
             linear = Vector3(x=0, y=0, z=0)
             angular = Vector3(x=0, y=0, z=1)
             new_turn = Twist(linear=linear, angular=angular)
@@ -352,6 +352,7 @@ class Search():
             if not turning and current > (init_orient+margin):
                 turning = True
             if turning and ((init_orient-margin) <= current <= (init_orient+margin)): # if we have completed a full turn
+                rospy.loginfo("Breaking turn loop")
                 break
 
         rospy.loginfo(self.state)
