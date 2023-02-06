@@ -350,7 +350,7 @@ class Search():
 
             if not turning and current != init_orient:
                 turning = True
-            if turning and current > init_orient: # if we have completed a full turn
+            if turning and ((init_orient-5) <= current <= (init_orient+5)): # if we have completed a full turn
                 break
 
         rospy.loginfo(self.state)
