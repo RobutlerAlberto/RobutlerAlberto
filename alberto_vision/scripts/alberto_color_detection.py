@@ -220,14 +220,17 @@ class ColorDetection:
         # Defines color as per the mission requirements to find violet balls
         if mission_id_msg.data == 20:
             self.color = 'violet'
+            self.centroids =  {}
 
         # Defines color as per the mission requirements to find blue cubes
         if mission_id_msg.data == 24:
             self.color = 'blue'
+            self.centroids =  {}
 
         # Defines color as per the mission requirements to find blue cubes
         if mission_id_msg.data == 25:
             self.color = 'red'
+            self.centroids =  {}
 
         # If the mission ID it not one relevant to this code, reset variables
         if mission_id_msg.data not in (20, 24, 25):

@@ -231,15 +231,19 @@ class Search():
 
     def run(self):
         while not rospy.is_shutdown():
-            # if self.state == 'dormant':
-            #     pass
-            # rospy.loginfo(self.state)
+            if self.state != 'dormant':
+                if self.state == 'travelling':
+                    rospy.loginfo(str(self.state) + " to " + str(self.next_stop))
+                else:
+                    rospy.loginfo(self.state)
             #! Temp sleep
             rospy.sleep(1)
             if self.state == 'ready_for_path':
                 self.find_optimal_search_path()
             elif self.state == 'ready_for_next_stop':
+                rospy.loginfo("POPPED AN ELEMENT")
                 next_stop = self.search_path.pop(0)
+                self.next_stop = next_stop # just for printing
                 next_stop_coords = self.house_rooms['coordinates'][next_stop]
                 self.go(next_stop_coords)
             
@@ -269,8 +273,11 @@ class Search():
         min_d, closest_room = float('inf'), None
         # current_room = self.find_room_by_coords(coords)
 
+        
         current_room_d, current_room = float('inf'), None
-        for room, room_coords in self.house_rooms['coordinates']:
+
+        # See what room the robot is in
+        for room, room_coords in self.house_rooms['coordinates'].items():
             d = math.sqrt((room_coords[0]-x1)**2 + (room_coords[1]-y1)**2)
             if d < current_room_d:
                 current_room_d = d
@@ -279,7 +286,7 @@ class Search():
         # connections in which the current room is involved
         # connections = [conn for conn in self.house_rooms['connections'] if (conn[0]==current_room or conn[1]==current_room)]
         connections = self.house_rooms['connections'][current_room]
-        for room, d in connections:
+        for room, d in connections.items():
             # room = conn[0] if conn[1]==current_room else conn[1] # room we might potentially go to
             if room not in searched_rooms and d < min_d:
                 #! this could be simplified by using the distances from the dict
@@ -289,6 +296,43 @@ class Search():
                 # if d < min_d:
                 min_d = d
                 closest_room = room
+
+        #Problem : Whenever the robot is backed into a dead end, the only way to exit is through a already searched room
+        #Solution : Whenever the robot can't find a non searched room, it should look into the connections of the next room
+        
+        #*Initially should search in adjacent to current room
+        possible_adjacent_rooms = list(self.house_rooms['connections'][current_room].items())
+        adjacent_rooms_tested = []
+
+        while closest_room is None: # This should mean the robot is backed into a dead end
+            # .items() returns a special not subscriptable dict_keys object, not a list
+            
+            #!In a 2nd order dead end,the robot cant chose the adjacent room which leads go doing deeper into the dead end
+            min_adj_distance,adjacent_room = float('inf'),None
+            for possible_room,distance in possible_adjacent_rooms:
+                if possible_room not in adjacent_rooms_tested and distance<min_adj_distance:
+                    min_adj_distance = distance
+                    adjacent_room = possible_room
+                    adjacent_rooms_tested.append(adjacent_room)
+
+            # rospy.loginfo("Adjacent room is " + str(adjacent_room))
+
+            if adjacent_room is None:
+                break
+
+            connections = self.house_rooms['connections'][adjacent_room]
+            for room, d in connections.items():
+                # room = conn[0] if conn[1]==current_room else conn[1] # room we might potentially go to
+                if room not in searched_rooms and d < min_d:
+                    min_d = d
+                    closest_room = room
+        
+            #Updating room for next search
+            possible_adjacent_rooms = list(self.house_rooms['connections'][adjacent_room].items())
+        
+        #! Is there anyway this while gets stuck?
+        # The while is needed in case the robot is backed into a "2nd order dead end"
+
         return closest_room
     
     def go(self, coords): # publish to /goal_coords (geometry_msgs.msg Point)
@@ -316,13 +360,22 @@ class Search():
             path = []
             starting_coords = self.current_coords
 
+            
+
             while len(path) < len(self.house_rooms['coordinates']):
                 new_room = self.find_closest_room(starting_coords, path)
                 path.append(new_room)
+
+                #TODO! temporary, for some reason the kitchen isnt being considered
+                if new_room is None:
+                    break 
+
+                # rospy.loginfo("New room to add to path is " + str(new_room))
+                # rospy.loginfo("Current path is " + str(path))
                 new_room_coords = self.house_rooms['coordinates'][new_room]
                 starting_coords = new_room_coords
             self.search_path = path
-            rospy.loginfo(self.search_path)
+            rospy.loginfo("Final path is "+str(self.search_path))
             self.state = 'ready_for_next_stop'
 
             # start_room = self.find_closest_room(self.current_coords)

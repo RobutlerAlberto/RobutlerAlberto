@@ -53,8 +53,8 @@ class ObjectDetection:
         # Load YOLO
         rospack = rospkg.RosPack()
         path = rospack.get_path('alberto_vision') + r"/src"
-        weight = path + r"/yolov4-tiny.weights"
-        cfg = path + r"/yolov4-tiny.cfg"
+        weight = path + r"/yolov3-tiny.weights"
+        cfg = path + r"/yolov3-tiny.cfg"
         net = cv2.dnn.readNetFromDarknet(cfg, weight)
 
         #? This part detects objects and connects the identifiers to the object's bounding boxes
