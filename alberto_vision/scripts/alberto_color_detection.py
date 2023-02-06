@@ -5,11 +5,15 @@
 # RobutlerAlberto
 # --------------------------------------------------
 
+from copy import deepcopy
+import time
 import cv2
 import numpy as np
 import rospy
 from alberto_get_camera_footage import image
 from std_msgs.msg import Int16
+from colorama import Fore, Back, Style
+from termcolor import colored
 class ColorDetection:
 
     def __init__(self):
@@ -20,7 +24,10 @@ class ColorDetection:
         self.color = ' '
 
         # Set object count
-        self.objectq_count = 0
+        self.object_count = 0
+
+        self.print_color = 'green'
+        self.printed = False
 
         # Set detected contours
         self.detected_contours = set()
@@ -80,12 +87,18 @@ class ColorDetection:
 
             # Get image
             img = self.rgb_camera.image_args['cv_image']
+
+            # Create working copy
+            img_gui = deepcopy(img)
             
             # If there's no color, continue showing image
             if not self.color:
-                cv2.imshow("Result", img)
-                cv2.waitKey(1)
+                cv2.imshow("Color Detection", img)
+                cv2.waitKey(1)      
                 continue
+
+            cv2.namedWindow('Color Detection', cv2.WINDOW_AUTOSIZE)
+            cv2.startWindowThread()
 
             # Get color boundaries for the requested color
             lower_bound, upper_bound = self.color_chose()
@@ -95,13 +108,13 @@ class ColorDetection:
                 continue
 
             # Convert the frame to HSV color space
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+            hsv = cv2.cvtColor(img_gui, cv2.COLOR_BGR2HSV)
 
             # Threshold the HSV image to get only the specified color
             mask = cv2.inRange(hsv, lower_bound, upper_bound)
 
             # Bitwise-AND mask and original image
-            res = cv2.bitwise_and(img,img, mask= mask)
+            res = cv2.bitwise_and(img_gui,img_gui, mask= mask)
 
             # Find contours in the resulting mask
             contours, hierarchy = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -119,7 +132,7 @@ class ColorDetection:
                 if cv2.contourArea(cnt) not in self.detected_contours:
                     self.detected_contours.append(cv2.contourArea(cnt))
                     # Uncomment to draw contours
-                    # cv2.drawContours(img,[hull],0,(0,255,0),2)
+                    # cv2.drawContours(img_gui,[hull],0,(0,255,0),2)
 
                 # Compute the centroid of the current contour
                 M = cv2.moments(cnt)
@@ -134,7 +147,7 @@ class ColorDetection:
 
 
                 # Draw a red circle around the center of the contour
-                cv2.circle(img, (cX, cY), 3, (0, 0, 255), -1)
+                cv2.circle(img_gui, (cX, cY), 3, (0, 0, 255), -1)
 
                 # Assign a unique ID to the object if it's not in the dictionary
                 if cv2.contourArea(cnt) not in self.assigned_ids:
@@ -170,17 +183,23 @@ class ColorDetection:
             self.total_object_count = len(self.centroids)
             self.current_object_count = len(current_centroids)
 
+
             # Display the number of objects detected
-            cv2.putText(img, "Total objects detected: " + str(self.total_object_count), (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-            cv2.putText(img, "Current objects detected: " + str(self.current_object_count), (5, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 175), 2)
+            cv2.putText(img_gui, "Total objects detected: " + str(self.total_object_count), (5, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            cv2.putText(img_gui, "Current objects detected: " + str(self.current_object_count), (5, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 175), 2)
 
             # Display the resulting frame
-            cv2.imshow("Result", img)
+            cv2.imshow("Color Detection", img_gui)
 
             # Break the loop if 'q' is pressed
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-
+            
+            for i in range (self.current_object_count):
+                if self.found == True and not self.printed:
+                    print(Style.BRIGHT + Back.BLACK + Fore.GREEN + 'Object of color ' + colored(self.color, self.print_color) + Fore.GREEN + Style.BRIGHT + Back.BLACK + ' was detected' + Style.RESET_ALL)
+                    self.printed = True
+        
         # Destroy all windows
         cv2.destroyAllWindows()
 
@@ -220,19 +239,29 @@ class ColorDetection:
         # Defines color as per the mission requirements to find violet balls
         if mission_id_msg.data == 20:
             self.color = 'violet'
-
+            self.print_color = 'magenta'
+            self.centroids =  {}
+            self.printed = False
+        
         # Defines color as per the mission requirements to find blue cubes
         if mission_id_msg.data == 24:
             self.color = 'blue'
+            self.print_color = 'blue'
+            self.centroids =  {}
+            self.printed = False
 
         # Defines color as per the mission requirements to find blue cubes
         if mission_id_msg.data == 25:
             self.color = 'red'
+            self.print_color = 'red'
+            self.centroids =  {}
+            self.printed = False
 
         # If the mission ID it not one relevant to this code, reset variables
         if mission_id_msg.data not in (20, 24, 25):
             self.color = None
             self.centroids =  {}
+            self.printed = False
 
 if __name__ == '__main__':
     rospy.init_node('color_detection', anonymous=False)
