@@ -105,7 +105,7 @@ This project was developed for Robotics Systems Programing class for the third r
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This project is written in python with [ROS Noetic](http://wiki.ros.org/ROS/Installation) to control all the aspects of the robot and its communication. To do object detection is used the [OpenCV](https://opencv.org/) library and [YOLO](/https://pjreddie.com/darknet/yolo/).
+This project is written in python with [ROS Noetic](http://wiki.ros.org/ROS/Installation) to control all the aspects of the robot and its communication. To do object detection is used the [OpenCV](https://opencv.org/) library and [YOLO](https://pjreddie.com/darknet/yolo/).
 ***
 ### Prerequisites
 
