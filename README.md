@@ -30,7 +30,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/RobutlerAlberto/RobutlerAlberto">
-    <img src="/docs/robutler.jpg" alt="Logo" width="450" height="350">
+    <img src="docs/logo.png" alt="Logo" width="450" height="350">
   </a>
 
 <h3 align="center">Robutler Alberto</h3>
@@ -78,7 +78,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 <div align="center">
-<img  src="docs/robutler.jpg" alt="Logo" width="400">
+<img  src="docs/logo.png" alt="Logo" width="400">
 </div>
 
 This project was developed for Robotics Systems Programing class for the third report. The objective is to develop a robotic system that works as a butler. The robutler must be able to complete several support missions normally realized by humans. Also, there must be implemented functionalities that guarantee the viability of the missions, such as object detection and possibility of dislocation inside the scenery.   
@@ -216,14 +216,14 @@ Project Link: [Robutler Alberto](https://github.com/RobutlerAlberto/RobutlerAlbe
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/andrefdre/Dora_the_mug_finder_SAVI.svg?style=for-the-badge
-[contributors-url]: https://github.com/andrefdre/Dora_the_mug_finder_SAVI/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/andrefdre/Dora_the_mug_finder_SAVI.svg?style=for-the-badge
-[forks-url]: https://github.com/andrefdre/Dora_the_mug_finder_SAVI/network/members
-[stars-shield]: https://img.shields.io/github/stars/andrefdre/Dora_the_mug_finder_SAVI.svg?style=for-the-badge
-[stars-url]: https://github.com/andrefdre/Dora_the_mug_finder_SAVI/stargazers
-[issues-shield]: https://img.shields.io/github/issues/andrefdre/Dora_the_mug_finder_SAVI.svg?style=for-the-badge
-[issues-url]: https://github.com/andrefdre/Dora_the_mug_finder_SAVI/issues
-[license-shield]: https://img.shields.io/github/license/andrefdre/Dora_the_mug_finder_SAVI.svg?style=for-the-badge
-[license-url]: https://github.com/andrefdre/Dora_the_mug_finder_SAVI/blob/master/LICENSE.txt
-[product-screenshot]: Docs/logo.svg
+[contributors-shield]: https://img.shields.io/github/contributors/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
+[contributors-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
+[forks-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/network/members
+[stars-shield]: https://img.shields.io/github/stars/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
+[stars-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/stargazers
+[issues-shield]: https://img.shields.io/github/issues/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
+[issues-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/issues
+[license-shield]: https://img.shields.io/github/license/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
+[license-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/blob/master/LICENSE.txt
+[product-screenshot]: docs/logo.png
