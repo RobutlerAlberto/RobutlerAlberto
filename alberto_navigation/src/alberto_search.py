@@ -2,11 +2,10 @@
 
 import math
 import rospy
-from std_msgs.msg import String,Int16
-from geometry_msgs.msg import PoseWithCovarianceStamped, Point
-from time import sleep
-from actionlib_msgs.msg import GoalStatusArray
+from std_msgs.msg import Int16
+from geometry_msgs.msg import PoseWithCovarianceStamped, Point, Twist, Vector3
 from move_base_msgs.msg import MoveBaseActionResult
+from sensor_msgs.msg import Imu
 
 """
 entities present:
@@ -146,47 +145,6 @@ class Search():
                     'dining_room': 2.59
                 }
             },
-            # 'connections': [
-            #     # (R1, R2, distance)
-            #     ('bedroom1L', 'bedroom1L', 0),
-            #     ('bedroom1R', 'bedroom1R', 0),
-            #     ('bedroom2T', 'bedroom2T', 0),
-            #     ('bedroom2B', 'bedroom2B', 0),
-            #     ('hall1', 'hall1', 0),
-            #     ('hall2', 'hall2', 0),
-            #     ('bedroom3T', 'bedroom3T', 0),
-            #     ('bedroom3B', 'bedroom3B', 0),
-            #     ('toilet1', 'toilet1', 0),
-            #     ('vestibule', 'vestibule', 0),
-            #     ('toilet2', 'toilet2', 0),
-            #     ('dining_room', 'dining_room', 0),
-            #     ('terraceT', 'terraceT', 0),
-            #     ('terraceB', 'terraceB', 0),
-            #     ('living_roomL', 'living_roomL', 0),
-            #     ('living_roomM', 'living_roomM', 0),
-            #     ('living_roomR', 'living_roomR', 0),
-            #     ('kitchen', 'kitchen', 0),
-            #     ('bedroom1L', 'bedroom1R', 2.52),
-            #     ('bedroom1R', 'hall1', 1.58),
-            #     ('bedroom2T', 'bedroom2B', 2.28),
-            #     ('bedroom2B', 'hall1', 2.51), 
-            #     ('bedroom2B', 'hall2', 3.53), 
-            #     ('bedroom3T', 'bedroom3B', 1.70), 
-            #     ('bedroom3B', 'hall2', 2.16), 
-            #     ('toilet1', 'hall2', 1.40), 
-            #     ('vestibule', 'hall2', 2.20), 
-            #     ('toilet2', 'vestibule', 1.37), 
-            #     ('dining_room', 'hall1', 2.45), 
-            #     ('dining_room', 'kitchen', 2.59), 
-            #     ('dining_room', 'terraceT', 3.03), 
-            #     ('terraceT', 'terraceB', 4.61), 
-            #     ('terraceB', 'living_roomL', 1.60), 
-            #     ('living_roomL', 'living_roomM', 2.04), 
-            #     ('living_roomM', 'living_roomR', 2.45), 
-            #     ('dining_room', 'living_roomL', 1.92), 
-            #     ('dining_room', 'living_roomM', 2.07), 
-            #     ('living_roomR', 'vestibule', 3.10)
-            # ],
             # coordinates of each room
             'coordinates': {
                 # R: (x, y)
@@ -215,6 +173,7 @@ class Search():
         
         # rospy.init_node('search_pubsub', anonymous=True)
         self.current_coords = None
+        self.current_orientation = None
         self.goal_reached   = False
         self.goal_object    = None
         self.object_found   = False
@@ -225,7 +184,9 @@ class Search():
         # self.goal_listener      = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
         self.goal_listener      = rospy.Subscriber("/move_base/result",MoveBaseActionResult,self.goal_listener_callback)
         self.mission_listener   = rospy.Subscriber("/active_mission_ID",Int16,self.mission_listener_callback)
+        self.orientation_listener = rospy.Subscriber('/imu', Imu, self.orientation_listener_callback)
         self.goal_publisher     = rospy.Publisher('/goal_coords', Point, queue_size=10)
+        self.turning_publisher  = turning_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=2)
 
         self.state = 'dormant'
         self.run()
@@ -356,10 +317,25 @@ class Search():
 
     def turn(self):
         self.state = 'turning'
+        while not self.current_orientation:
+            pass
+
+        turning = False
+        init_orient = self.current_orientation[2] # z value
+
+        while True:
+            linear = Vector3(x=0, y=0, z=0)
+            angular = Vector3(x=0, y=0, z=10)
+            new_turn = Twist(linear=linear, angular=angular)
+            self.turning_publisher.publish(new_turn)
+
+            if not turning and self.current_orientation[2] != init_orient:
+                turning = True
+            if turning and self.current_orientation[2] > init_orient: # if we have completed a full turn
+                break
+
         rospy.loginfo(self.state)
-        rospy.sleep(1)
         self.state = 'ready_for_next_stop'
-        # TODO: turning logic
         # TODO: update self.object_found according to results
 
     def find_optimal_search_path(self):
@@ -408,14 +384,6 @@ class Search():
             #! needs testing
             rospy.sleep(2) # rospy.sleep
  
-
-    def init_listener(self):
-        rospy.Subscriber('/amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
-
-    # def init_listener(self):
-    #     rospy.loginfo('INIT SUBSCRIBER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    #     sub = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.listener_callback)
-    #     return sub
 
     def coords_listener_callback(self, data):
         position = data.pose.pose.position
@@ -476,9 +444,31 @@ class Search():
             self.goal_object = "count_blue_cubes"
             self.mission_active = True
             self.state = 'ready_for_path'
+
+    def orientation_listener_callback(self, data):
+        quaternion_orientation = data.orientation
+        self.current_orientation = self.euler_from_quaternion(
+            quaternion_orientation.x,
+            quaternion_orientation.y,
+            quaternion_orientation.z,
+            quaternion_orientation.w)
+
+    def euler_from_quaternion(self, x, y, z, w):
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll_x = math.atan2(t0, t1)
+     
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch_y = math.asin(t2)
+     
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw_z = math.atan2(t3, t4)
+     
+        return roll_x, pitch_y, yaw_z # in radians
             
-
-
 
     # def init_publisher(self):
     #     rospy.loginfo('INIT PUBLISHER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
