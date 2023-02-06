@@ -6,6 +6,7 @@ from std_msgs.msg import String,Int16
 from geometry_msgs.msg import PoseWithCovarianceStamped, Point
 from time import sleep
 from actionlib_msgs.msg import GoalStatusArray
+from move_base_msgs.msg import MoveBaseActionResult
 
 """
 entities present:
@@ -218,11 +219,11 @@ class Search():
         self.goal_object    = None
         self.object_found   = False
         self.final_stop     = False
-        self.finish         = False
         self.mission_active = False
 
         self.coords_listener    = rospy.Subscriber('amcl_pose', PoseWithCovarianceStamped, self.coords_listener_callback)
-        self.goal_listener      = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
+        # self.goal_listener      = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
+        self.goal_listener      = rospy.Subscriber("/move_base/result",MoveBaseActionResult,self.goal_listener_callback)
         self.mission_listener   = rospy.Subscriber("/active_mission_ID",Int16,self.mission_listener_callback)
         self.goal_publisher     = rospy.Publisher('/goal_coords', Point, queue_size=10)
 
@@ -254,12 +255,22 @@ class Search():
             
             elif self.state == 'ready_for_turn':
                 self.turn()
+                rospy.loginfo(self.search_path)
+
+                if len(self.search_path) == 0:
+                    self.final_stop = True
+                    rospy.loginfo("Final stop true")
+
+                if self.final_stop:
+                    rospy.loginfo("self-finish is true")
+                    self.mission_active = False
+                    self.state = 'dormant'
+                    self.final_stop = False
+            # What is happening is that its leavning turn withouth setting self.finish
                 
             # elif self.state == 'turning':
             #     pass
 
-            if self.finish:
-                self.state = 'dormant'
     # def reset(self):
     #     self.searched_rooms = []
 
@@ -350,9 +361,6 @@ class Search():
         self.state = 'ready_for_next_stop'
         # TODO: turning logic
         # TODO: update self.object_found according to results
-        if self.final_stop:
-            self.finish = True
-            self.mission_active = False
 
     def find_optimal_search_path(self):
         if self.current_coords: # if the robot doesn't know its own position yet, this function will be continuously called until it does
@@ -364,13 +372,13 @@ class Search():
 
             while len(path) < len(self.house_rooms['coordinates']):
                 new_room = self.find_closest_room(starting_coords, path)
-                path.append(new_room)
 
                 #TODO! temporary, for some reason the kitchen isnt being considered
                 if new_room is None:
                     break 
 
-                # rospy.loginfo("New room to add to path is " + str(new_room))
+                path.append(new_room)
+                rospy.loginfo("New room to add to path is " + str(new_room))
                 # rospy.loginfo("Current path is " + str(path))
                 new_room_coords = self.house_rooms['coordinates'][new_room]
                 starting_coords = new_room_coords
@@ -422,7 +430,7 @@ class Search():
             return
 
         try:
-            goal_status_int = data.status_list[0].status    #* 1 for active, 3 for completed with success
+            goal_status_int = data.status.status    #* 1 for active, 3 for completed with success
         except:
             self.goal_reached = False
             return
@@ -433,14 +441,17 @@ class Search():
             # Should only transition to ready for turn if its traveling
             self.state = 'ready_for_turn' if self.state == 'travelling' else self.state 
 
-            if len(self.search_path) == 0:
-                self.final_stop = True
+            #! This cant be here as now its only updated in the end once
+            # if len(self.search_path) == 0:
+            #     self.final_stop = True
+
+
             #     self.state = 'ready_for_turn'
             # else:
             #     self.state = 'ready_for_next_stop'
-        # elif goal_status_int == 1 :
-        else:  #! This makes it so unless the goal is reached with success, this atribute  is always false, not sure which line is more adequate
+        else:  
             self.goal_reached = False
+            #TODO! THIS SHOULD MEAN MISSION ABORTED
 
     def mission_listener_callback(self, data):
         #! TODO: setup mission from data
