@@ -6,7 +6,6 @@
 # --------------------------------------------------
 
 from copy import deepcopy
-import time
 import cv2
 import numpy as np
 import rospy

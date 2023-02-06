@@ -30,7 +30,7 @@ class ObjectDetection:
 
     def __init__(self):
         # Listens for the mission ID
-        mission_listener = rospy.Subscriber("/active_mission_ID", Int16, self.mission_listener_callback)
+        rospy.Subscriber("/active_mission_ID", Int16, self.mission_listener_callback)
 
 
         rospy.init_node('camera_footage', anonymous=False)
