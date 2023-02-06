@@ -338,17 +338,19 @@ class Search():
             pass
 
         turning = False
-        init_orient = self.current_orientation[2] # z value
+        init_orient = self.current_orientation[2] if (self.current_orientation[2]>0) else (2*math.pi + self.current_orientation[2]) # z value (0 to 2*pi)
 
         while True:
             linear = Vector3(x=0, y=0, z=0)
-            angular = Vector3(x=0, y=0, z=10)
+            angular = Vector3(x=0, y=0, z=1)
             new_turn = Twist(linear=linear, angular=angular)
             self.turning_publisher.publish(new_turn)
 
-            if not turning and self.current_orientation[2] != init_orient:
+            current = self.current_orientation[2] if (self.current_orientation[2]>0) else (2*math.pi + self.current_orientation[2])
+
+            if not turning and current != init_orient:
                 turning = True
-            if turning and self.current_orientation[2] > init_orient: # if we have completed a full turn
+            if turning and current > init_orient: # if we have completed a full turn
                 break
 
         rospy.loginfo(self.state)
