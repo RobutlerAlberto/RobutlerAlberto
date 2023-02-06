@@ -38,14 +38,14 @@
   <p align="center">
     Repository for a Robot Butler project developed for the course of Programming of Robotic Systems at the University of Aveiro, 2022/2023.
     <br />
-    <a href="https://github.com/andrefdre/Dora_the_mug_finder_SAVI/wiki"><strong>Explore the Wiki »</strong></a>
+    <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/wiki"><strong>Explore the Wiki »</strong></a>
     <br />
     <br />
-    <a href="https://youtu.be/vULnTanHHmM">View Demo</a>
+    <a href="https://youtu.be">View Demo</a>
     ·
-    <a href="https://github.com/andrefdre/Dora_the_mug_finder_SAVI/issues">Report Bug</a>
+    <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/issues">Report Bug</a>
     ·
-    <a href="https://github.com/andrefdre/Dora_the_mug_finder_SAVI/issues">Request Feature</a>
+    <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/issues">Request Feature</a>
   </p>
 </div>
 
@@ -105,51 +105,28 @@ This project was developed for Robotics Systems Programing class for the third r
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This project uses [ROS Noetic](http://wiki.ros.org/ROS/Installation) to aid the use of the kinect camera and the object classification CNN is built based on [PyTorch](https://pytorch.org/). To do object detection is used [Open3D](http://www.open3d.org/).
-
+This project is written in python with [ROS Noetic](http://wiki.ros.org/ROS/Installation) to control all the aspects of the robot and its communication. To do object detection is used the [OpenCV](https://opencv.org/) library and [YOLO](/https://pjreddie.com/darknet/yolo/).
+***
 ### Prerequisites
 
-To use this code, first add the next line in the bashrc or your shell configuration file:
+To use this code, first you need to download the .cfg and .weights file from [YOLO](https://github.com/AlexeyAB/darknet/). You can either get the tiny yolov3 in [yolov3-tiny.cfg](https://github.com/pjreddie/darknet/blob/master/cfg/yolov3-tiny.cfg) and [yolov3-tiny.weights](https://pjreddie.com/media/files/yolov3-tiny.weights) (this one is already in this repo) or any other version. Just make sure you put both these files inside the folder `alberto_vision/src`.
 
-  ```
-#Dora The Mug FInder
-export DORA=/home/andre/dora_the_mug_finder
-export PYTHONPATH="$PYTHONPATH:${HOME}/catkin_ws/src/Dora_the_mug_finder_SAVI"
-  ```
-Replace the path of DORA to where all the datasets are stored in your computer. You can download them [here](https://rgbd-dataset.cs.washington.edu/).
-
-Afterward, update the shell with the new configuration using:
-```
-source ~/.bashrc
-```
-If you use zsh, just change to *.zshrc*.
-
-Inside DORA folder, there should be a structure similar to:
-  - models
-  - rgbd-dataset
-  - rgbd-scenes-v2
-    - pc
-    - imgs
-  - rosbag
-
-
-
+***
 ### Installation
 To install the project, clone the repository inside the *src* folder of your *catkin_ws*, running the following lines:
 ```
-git clone https://github.com/andrefdre/Dora_the_mug_finder_SAVI.git
+git clone https://github.com/RobutlerAlberto/RobutlerAlberto.git
 cd ..
 catkin_make
 ```
 
 To install all the dependencies of this package, just run in your terminal:
 ```
-roscd dora_the_mug_finder_bringup
+roscd alberto_bringup
 cd ..
 pip install -r requirements.txt
 ```
 
-If you have/want to use a Kinect camera with this project, you can find [here](https://github.com/andrefdre/Dora_the_mug_finder_SAVI/wiki/Instalation#kinect) how to install all the dependencies needed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -207,7 +184,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- LICENSE -->
 ## License
 
-Distributed under the GPL License. See `LICENSE.txt` for more information.
+Distributed under the GPL License. See `license.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -216,13 +193,13 @@ Distributed under the GPL License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-André Cardoso - andref@ua.pt
-
-Tatiana Resende - tatianaresende@ua.pt
+Bruno Silva - bruno.favs@ua.pt
 
 Fábio Sousa - fabiorsousa81@ua.pt
 
-Project Link: [Dora the Mug Finder](https://github.com/andrefdre/Dora_the_mug_finder_SAVI)
+Isabel Rosário - isabel.rosario@ua.pt
+
+Project Link: [Robutler Alberto](https://github.com/RobutlerAlberto/RobutlerAlberto)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
