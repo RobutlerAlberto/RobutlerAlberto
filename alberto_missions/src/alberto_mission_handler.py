@@ -161,8 +161,7 @@ class MissionHandler():
        self.genericMission("check_if_someone_is_home") 
     
     def countNumOfCubes(self,feedback):
-       self.genericMission("count_num_of_cubes_in_house") 
-
+       self.genericMission("count_num_of_blue_cubes_in_house") 
     def touchPerson(self,feedback):
        self.genericMission("touch_person") 
 
