@@ -72,7 +72,9 @@
     <!-- Search -->
     <node pkg="alberto_navigation" name="alberto_search" type="alberto_search.py" output="screen"></node>
 
-
+    <!-- Object spawn -->
+    <!-- <node pkg="alberto_vision" name="insert_object" type="alberto_object_spawn.py" output="screen"></node> -->
+    
     <!-- Missions -->
     <include file="$(find alberto_bringup)/include/alberto_missions.launch">
     </include>

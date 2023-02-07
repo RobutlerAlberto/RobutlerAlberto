@@ -133,38 +133,45 @@ pip install -r requirements.txt
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-### Train Model
-To Train the model, run the code:
-```
-rosrun dora_the_mug_finder_bringup model_train.py -fn <folder_name> -mn <model_name> -n_epochs 50 -batch_size 256 -c 0
-```
+### Launch files
 
-Where the __*<folder_name>*__ and __*<model_name>*__  should be replaced by the names you want to give. 
+In the first place, open the terminal and run:
 
+```
+roslaunch alberto_bringup alberto_gazebo.launch
+```
+After that, in another terminal run:
+```
+roslaunch alberto_bringup alberto_bringup.launch
+```
+With these two lines, everything you need is already running and you can start using the project.
 ***
-### Run Object extractor and classifier
-To run the detector with previous trained model run the code:
-```
-roslaunch dora_the_mug_finder_bringup dora_bringup.launch mn:=<model_name> fn:=<folder_name>
-```
-Where the __*<folder_name>*__ and __*<model_name>*__ should be replaced by a name for the model previously set while training. 
-If you want to visualize extracted images run:
-```
-roslaunch dora_the_mug_finder_bringup dora_bringup.launch mn:=<model_name> fn:=<folder_name> visualize:=True
-```
-It's also possible to add the argument __*audio*__ to initialize audio describing the objects, setting it to true:
-```
-roslaunch dora_the_mug_finder_bringup dora_bringup.launch mn:=<model_name> fn:=<folder_name> audio:=true
-```
+#### Controller
 
+It's possible to control the robot using a controller. For that, you need to define the variable `controller` when you do the `alberto_bringup.launch`, as following:
+```
+roslaunch alberto_bringup alberto_bringup.launch controller:=true
+```
 ***
-### Run Kinect
-It's also possible to use a kinect camera for processing in real time, by adding the __*kinect*__ argument:
+#### Bagfile
+Also, if you want to test the code with a previously recorded bagfile, first make sure it is stored inside `/alberto_vision/bagfiles`, with the name `bertinho`. After, run:
 ```
-roslaunch dora_the_mug_finder_bringup dora_bringup.launch mn:=<model_name> fn:=<folder_name> kinect:=true
+roslaunch alberto_bringup alberto_bringup.launch bagfile:=true
 ```
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+***
+### Robot dislocation
+The robot can be controlled in several distinct ways:
+ - Teleop to control robot velocity and direction;
+ <div align="center">
+<img  src="docs/teleop.png" alt="Logo" width="400">
+</div>
+ 
+ - Selection of XY coordinates in RViz
+ - With semantic information by doing right click on the robot and selecting a division for it to go.
+***
+ ### Robot features
+Also, with the right click on the robot you can see the several things the robot can do, like searching for objects and even persons.
+#### 
 <!-- CONTRIBUTING -->
 ## Contributing
 
