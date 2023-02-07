@@ -111,7 +111,7 @@ class MissionHandler():
         ("search_red_ball_in_house"           , 25), #! Por implementar
         ("search_computer"                    , 26), #! Por implementar
         ("see_if_table_is_empty"              , 27), #! Por implementar
-        
+        ("spawn_object"                       , 28), #! Por implementar
         #Active
         ("touch_person"      , 30)
         ]
