@@ -1,0 +1,11 @@
+yolov3.weights
+__pycache__
+.gitattributes
+bertinho2.bag
+objects.world
+yolov3-spp.cfg
+yolov3-spp.weights
+yolov4-tiny.cfg
+yolov4-tiny.weights
+yolov4.cfg
+yolov4.weights
