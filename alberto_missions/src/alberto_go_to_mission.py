@@ -45,6 +45,8 @@ class GoTo(Mission):
 
 
         self.ID = msg.data
+        
+        #TODO this if seems redundant
         if self.ID == 0:
             self.cancelNavgoal()
             self.reset()        
@@ -72,20 +74,22 @@ class GoTo(Mission):
             return
 
         rospy.loginfo("Entered run")
+        rospy.loginfo(self.status)
+        rospy.loginfo("Global mission go to status is " + str(self.global_status))
         # rospy.loginfo("mission id is" + str(self.ID))
         # rospy.loginfo("Key in dict of ids is " + str(self.ID in GoTo.go_to_id_coords.keys()))
         # Should only do mission if there isn't another mission active
 
 
 
-        if self.status == 'dormant' and self.global_status == True: 
+        if self.status == 'dormant' and self.global_status : 
             
             self.goal_coords = GoTo.go_to_id_coords.get(self.ID) # get() returns none if the key is not found, dict['key'] yields error
             coords_msg = Point(x=self.goal_coords[0],y =self.goal_coords[1])
             self.goal_coords_pub.publish(coords_msg)
             self.status = 'travelling'
 
-        if self.nav_goal_reached == True and self.status == 'travelling':
+        if self.nav_goal_reached  and self.status == 'travelling':
             self.reset() # Ends mission
 
     def cancelMission(self):
@@ -100,14 +104,12 @@ def main():
         
         mission.run()
         rospy.sleep(1)
-        rospy.loginfo(mission.status)
-        
+        # rospy.loginfo(mission.status) 
         #! If this if is below, it would evaluate false if the global status was false and and goal aborted were true
-        if mission.nav_goal_aborted == True:
+        if mission.nav_goal_aborted:
             mission.cancelMission() #Cancels navgoal
             mission = GoTo() # Doing this sets everything back to zero and stops the mission
 
-        rospy.loginfo("Global mission status is " + str(mission.global_status))
         # if mission.global_status == False:
         #     mission = GoTo() # If status is false, resets the class for next mission
 

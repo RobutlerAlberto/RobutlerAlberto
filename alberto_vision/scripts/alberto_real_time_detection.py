@@ -11,7 +11,7 @@ import rospkg
 import rospy
 import numpy as np
 from alberto_get_camera_footage import image
-from std_msgs.msg import Int16
+from std_msgs.msg import Int16,Bool
 
 class ObjectDetection:
     def is_plane(self,image):
@@ -32,6 +32,7 @@ class ObjectDetection:
         # Listens for the mission ID
         rospy.Subscriber("/active_mission_ID", Int16, self.mission_listener_callback)
 
+        self.object_found_pub = rospy.Publisher("/object_found",Bool,queue_size=10)
 
         rospy.init_node('camera_footage', anonymous=False)
         # Calls the image class
@@ -54,8 +55,8 @@ class ObjectDetection:
         # Load YOLO
         rospack = rospkg.RosPack()
         path = rospack.get_path('alberto_vision') + r"/src"
-        weight = path + r"/yolov4-tiny.weights"
-        cfg = path + r"/yolov4-tiny.cfg"
+        weight = path + r"/yolov3-tiny.weights"
+        cfg = path + r"/yolov3-tiny.cfg"
         net = cv2.dnn.readNetFromDarknet(cfg, weight)
 
         #? This part detects objects and connects the identifiers to the object's bounding boxes
@@ -81,6 +82,7 @@ class ObjectDetection:
             if self.object == None:
                 self.rgb_camera.showImage(img)
                 continue
+
             # Get shape
             height, width, _ = img.shape
 
@@ -118,7 +120,6 @@ class ObjectDetection:
                         class_ids.append(class_id)
 
             indexes = cv2.dnn.NMSBoxes(boxes, confidences, 0.5, 0.4)
-
             font = cv2.FONT_HERSHEY_PLAIN
 
             for i in range(len(boxes)):
@@ -132,16 +133,22 @@ class ObjectDetection:
                         label = str(classes[class_ids[i]])
                         color = colors[i]
                         self.found = False
-                        if self.object_2:
-                            if label == (self.object_2 or self.object):
-                                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                                cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
+                        # if self.object_2:
+                            # if label == (self.object_2 or self.object):
+                        cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                        cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
+
+
+                        if label in [self.object,self.object_2]:
+                            found_msg = Bool()
+                            found_msg.data = self.found
+                            self.object_found_pub.publish(found_msg)
                                 # print(self.object + ' found')
-                        else:        
-                            if label == self.object:
-                                print('looking for sum bitches')
-                                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                                cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
+                        # else:        
+                            # if label == self.object:
+                                # print('looking for sum bitches')
+                                # cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                                # cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
                                 # print(self.object + ' found')
 
             # ----------------------------------------------
@@ -156,11 +163,11 @@ class ObjectDetection:
                 self.object_2 = 'tv_monitor'
             
             # Checks mission ID to detect persons            
-            if mission_id_msg.data == 24:
+            if mission_id_msg.data == 23:
                 self.object = 'person'
                 self.object_2 = None
 
-            if mission_id_msg.data not in (24,26):
+            if mission_id_msg.data not in (23,26):
                 self.object = None
                 self.object_2 = None
 
