@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Mission handler  -->
+    <node pkg="alberto_missions" type="alberto_mission_handler.py" name="alberto_mission_handler" output="screen">
+    </node>
+    
+    <node pkg="alberto_missions" type="alberto_go_to_mission.py" name="alberto_go_to_mission" output="screen">
+    </node>
+
+</launch>

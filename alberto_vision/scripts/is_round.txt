@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+# --------------------------------------------------
+# Fábio, Isabel
+# PSR, January 2023.
+# RobutlerAlberto
+# --------------------------------------------------
+
+#! código para ser implementado no color detection para saber se objecto é redondo ou não 
+# Iterate through the contours
+for contour in contours:
+    # Fit a circle around the contour
+    (x, y), radius = cv2.minEnclosingCircle(contour)
+    center = (int(x), int(y))
+    radius = int(radius)
+    # Calculate the area of the contour and the circle
+    contour_area = cv2.contourArea(contour)
+    circle_area = np.pi * radius**2
+    # Calculate the ratio of the two areas
+    ratio = contour_area / circle_area
+    # If the ratio is close to 1, consider the object to be round
+    if 0.9 < ratio < 1.1:
+        print("The object is round.")
+    else:
+        print("The object is not round.")

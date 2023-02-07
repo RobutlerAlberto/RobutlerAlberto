@@ -9,27 +9,20 @@ import rospy
 import cv2
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
-import numpy as np
 
 class image:
 
     def __init__(self, topic = "/depth_camera/color/image_raw"):
-        
-        # rospy.init_node('camera_footage', anonymous=False)
-        # self.camera_topic = rospy.get_param("~camera_topic", default= "/rrbot/camera1/image_raw")
-        
-        self.camera_topic = topic # rospy.get_param("~camera_topic", default= "/depth_camera/color/image_raw")
+        self.camera_topic = topic 
 
         self.bridge = CvBridge()
-        # self.image_sub = rospy.Subscriber("/depth_camera/color/image_raw", Image, self.subscriberCallback)
+
         self.image_sub = rospy.Subscriber(self.camera_topic, Image, self.subscriberCallback)
         self.image_args = {} # Contains cv_image
         self.begin_image = False
 
-    
 
     def subscriberCallback(self, image_msg):
-
         self.begin_image = True # After receiving first image will be forever true
 
         if self.camera_topic == "/depth_camera/depth/image_raw":
@@ -42,16 +35,11 @@ class image:
         #! If I assign directly to cv_image key, it will show flickers of the non flipped image 
         self.image_args["cv_image"] = img
 
-        # if self.camera_topic == "/depth_camera/depth/image_raw":
-        #     rospy.loginfo(self.image_args["cv_image"])  
-        # rospy.loginfo("Received image message, image shape is " + str(self.image_args["cv_image"].shape))
 
     def showImage(self, processed):
-
         if not self.begin_image: # Only shows after first image is processed
             return
 
-        
         cv2.imshow("CV_image", processed)
 
         pressed_key = cv2.waitKey(10) & 0xFF # To prevent NumLock issue
@@ -61,4 +49,7 @@ class image:
             cv2.destroyAllWindows()
             rospy.signal_shutdown("Order to quit") # Stops ros
             exit()                                 # Exits python script
+        elif pressed_key == ord('s'):
+            cv2.imwrite('print.png',self.image_args['cv_image'])
+            rospy.loginfo("Saving image")
 

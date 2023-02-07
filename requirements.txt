@@ -1,0 +1,4 @@
+numpy
+termcolor
+colorama
+opencv-python
