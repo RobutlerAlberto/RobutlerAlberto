@@ -127,23 +127,23 @@ class ObjectDetection:
                 if i in indexes:
 
                     x, y, w, h = boxes[i]
-                    interest_area = dm[y:(y+h), x:(x+w)]
+                    # interest_area = dm[y:(y+h), x:(x+w)]
 
-                    if interest_area.any() and not self.is_plane(interest_area):
-                        label = str(classes[class_ids[i]])
-                        color = colors[i]
-                        self.found = False
-                        # if self.object_2:
-                            # if label == (self.object_2 or self.object):
-                        cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-                        cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
+                    # if interest_area.any() and not self.is_plane(interest_area):
+                    label = str(classes[class_ids[i]])
+                    color = colors[i]
+                    self.found = False
+                    # if self.object_2:
+                        # if label == (self.object_2 or self.object):
+                    cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(img, label, (x, y + 30), font, 3, color, 3)
 
 
-                        if label in [self.object,self.object_2]:
-                            found_msg = Bool()
-                            found_msg.data = self.found
-                            self.object_found_pub.publish(found_msg)
-                                # print(self.object + ' found')
+                    if label in [self.object,self.object_2]:
+                        found_msg = Bool()
+                        found_msg.data = self.found
+                        self.object_found_pub.publish(found_msg)
+                                    # print(self.object + ' found')
                         # else:        
                             # if label == self.object:
                                 # print('looking for sum bitches')

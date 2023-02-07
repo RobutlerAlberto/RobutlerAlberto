@@ -173,13 +173,13 @@ class ColorDetection:
                 # Check if the object must be a square
                 if self.must_be_square:
                     # If the approximate contour has at least 4 vertices
-                    if len(approx) in range(4, 7):
+                    if len(approx) in range(4, 8):
                         # Fit a rectangle around the contour
                         x_r, y_r, w_r, h_r = cv2.boundingRect(cnt)
                         # Calculate the ratio of the areas
                         ratio_r= float(w_r)/h_r
                         # If the ratio is close to 1, consider the object as a rectangle
-                        if ratio_r>=0.90 and ratio_r<=1.1:
+                        if ratio_r>=0.80 and ratio_r<=1.1:
                             self.is_square = True
                     else:
                         continue
@@ -261,6 +261,12 @@ class ColorDetection:
                         obj = 'Sphere'
                     if self.is_square:
                         obj = 'Cube'
+                        
+                    try:
+                        obj
+                    except:
+                        continue
+
                     print(Style.BRIGHT + Back.BLACK + Fore.GREEN + obj + ' of color ' + colored(self.color, self.print_color) + Fore.GREEN + Style.BRIGHT + Back.BLACK + ' was detected' + Style.RESET_ALL)
                     self.printed = True
 
