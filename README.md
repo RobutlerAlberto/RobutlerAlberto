@@ -41,8 +41,8 @@
     <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/wiki"><strong>Explore the Wiki »</strong></a>
     <br />
     <br />
-    <a href="https://youtu.be">View Demo</a>
-    ·
+    <!-- <a href="https://youtu.be">View Demo</a> -->
+    <!-- · -->
     <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/issues">Report Bug</a>
     ·
     <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/issues">Request Feature</a>
@@ -246,5 +246,5 @@ Project Link: [Robutler Alberto](https://github.com/RobutlerAlberto/RobutlerAlbe
 [issues-shield]: https://img.shields.io/github/issues/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
 [issues-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/issues
 [license-shield]: https://img.shields.io/github/license/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
-[license-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/blob/master/LICENSE.txt
+[license-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/blob/master/license.txt
 [product-screenshot]: docs/logo.png
