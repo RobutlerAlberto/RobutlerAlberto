@@ -339,7 +339,7 @@ class Search():
             pass
 
         turning = False
-        init_orient = self.current_orientation[2] if (self.current_orientation[2]>0) else (2*math.pi + self.current_orientation[2]) # z value (0 to 2*pi)
+        init_orient = self.positive_angle_range(self.current_orientation[2]) # z value (0 to 2*pi)
 
         while not rospy.is_shutdown():
             linear = Vector3(x=0, y=0, z=0)
@@ -347,11 +347,13 @@ class Search():
             new_turn = Twist(linear=linear, angular=angular)
             self.turning_publisher.publish(new_turn)
 
-            current = self.current_orientation[2] if (self.current_orientation[2]>0) else (2*math.pi + self.current_orientation[2])
+            current = self.positive_angle_range(self.current_orientation[2])
+            limit1, limit2 = self.positive_angle_range(init_orient-margin), self.positive_angle_range(init_orient+margin)
+            min_angle, max_angle = min(limit1, limit2), max(limit1, limit2)
 
-            if not turning and current > (init_orient+margin):
+            if not turning and current > max_angle:
                 turning = True
-            if turning and ((init_orient-margin) <= current <= (init_orient+margin)): # if we have completed a full turn
+            if turning and (min_angle <= current <= max_angle): # if we have completed a full turn
                 rospy.loginfo("Breaking turn loop")
                 break
 
@@ -497,6 +499,9 @@ class Search():
         yaw_z = math.atan2(t3, t4)
      
         return roll_x, pitch_y, yaw_z # in radians
+
+    def positive_angle_range(self, angle):
+        return angle if (angle>=0) else (2*math.pi + angle)
             
 
     # def init_publisher(self):
