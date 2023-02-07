@@ -139,7 +139,7 @@ class ObjectDetection:
                                 # print(self.object + ' found')
                         else:        
                             if label == self.object:
-                                print('looking for sum bitches')
+                                # print('looking for sum bitches')
                                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
                                 cv2.putText(img, self.object, (x, y + 30), font, 3, color, 3)
                                 # print(self.object + ' found')

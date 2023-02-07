@@ -6,6 +6,7 @@ from geometry_msgs.msg import PoseWithCovarianceStamped, Point, Twist, Vector3
 from std_msgs.msg import Int16,Bool
 from move_base_msgs.msg import MoveBaseActionResult
 from sensor_msgs.msg import Imu
+import time
 
 """
 entities present:
@@ -334,28 +335,39 @@ class Search():
 
     def turn(self):
         self.state = 'turning'
-        margin = 30 * math.pi/180
-        while not self.current_orientation:
-            pass
+        # margin = 30 * math.pi/180
+        # while not self.current_orientation:
+        #     pass
 
-        turning = False
-        init_orient = self.positive_angle_range(self.current_orientation[2]) # z value (0 to 2*pi)
+        # turning = False
+        # init_orient = self.positive_angle_range(self.current_orientation[2]) # z value (0 to 2*pi)
 
+        initial_time =time.time()
         while not rospy.is_shutdown():
+            elapsed_time = time.time() - initial_time
+            if elapsed_time > 9:
+                break
+
+
             linear = Vector3(x=0, y=0, z=0)
             angular = Vector3(x=0, y=0, z=1)
             new_turn = Twist(linear=linear, angular=angular)
             self.turning_publisher.publish(new_turn)
 
-            current = self.positive_angle_range(self.current_orientation[2])
-            limit1, limit2 = self.positive_angle_range(init_orient-margin), self.positive_angle_range(init_orient+margin)
-            min_angle, max_angle = min(limit1, limit2), max(limit1, limit2)
+            # current = self.positive_angle_range(self.current_orientation[2])
+            # limit1, limit2 = self.positive_angle_range(init_orient-margin), self.positive_angle_range(init_orient+margin)
+            # min_angle, max_angle = min(limit1, limit2), max(limit1, limit2)
 
-            if not turning and current > max_angle:
-                turning = True
-            if turning and (min_angle <= current <= max_angle): # if we have completed a full turn
-                rospy.loginfo("Breaking turn loop")
-                break
+            # rospy.loginfo('upper limit: ' + str(max_angle))
+            # rospy.loginfo('current angle: ' + str(current))
+            # rospy.loginfo('lower limit: ' + str(min_angle) + '\n\n')
+            # rospy.sleep(1)
+
+            # if not turning and current > max_angle:
+            #     turning = True
+            # if turning and (min_angle <= current <= max_angle): # if we have completed a full turn
+            #     rospy.loginfo("Breaking turn loop")
+            #     break
 
         rospy.loginfo(self.state)
         self.state = 'ready_for_next_stop'
