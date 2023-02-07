@@ -49,4 +49,7 @@ class image:
             cv2.destroyAllWindows()
             rospy.signal_shutdown("Order to quit") # Stops ros
             exit()                                 # Exits python script
+        elif pressed_key == ord('s'):
+            cv2.imwrite('print.png',self.image_args['cv_image'])
+            rospy.loginfo("Saving image")
 
