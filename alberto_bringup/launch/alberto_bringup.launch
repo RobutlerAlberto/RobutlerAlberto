@@ -75,10 +75,8 @@
     <!-- Object spawn -->
     <node pkg="alberto_vision" name="insert_object" type="alberto_object_spawn.py" output="screen"></node>
     
-
-    <!-- Mission handler  -->
-    <node pkg="alberto_missions" type="alberto_mission_handler.py" name="alberto_mission_handler" output="screen">
-        
-    </node>
+    <!-- Missions -->
+    <include file="$(find alberto_bringup)/include/alberto_missions.launch">
+    </include>
 
 </launch>

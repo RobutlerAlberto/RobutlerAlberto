@@ -166,6 +166,9 @@ class MissionHandler():
     def touchPerson(self,feedback):
        self.genericMission("touch_person") 
 
+    def freeRobot(self,feedback):
+       self.genericMission("free") 
+
 # End of MissionHandler() class 
 
 def initMenu():
@@ -177,7 +180,9 @@ def initMenu():
     sub_menu_handle = menu_handler.insert( "Go to" ) # ID 1
 
     for division in house_rooms.keys(): # ID 2 - 12
-        menu_handler.insert( str(division) ,parent=sub_menu_handle, callback=mission.goToMission );
+        menu_handler.insert( str(division) ,parent=sub_menu_handle, callback=mission.goToMission);
+
+    free_entry = menu_handler.insert("Free",callback=mission.freeRobot)
 
     #*passive mission
     passive_entry = menu_handler.insert( "Passive missions")
