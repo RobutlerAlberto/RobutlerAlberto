@@ -38,7 +38,7 @@
   <p align="center">
     Repository for a Robot Butler project developed for the course of Programming of Robotic Systems at the University of Aveiro, 2022/2023.
     <br />
-    <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/wiki"><strong>Explore the Wiki »</strong></a>
+    <!-- <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/wiki"><strong>Explore the Wiki »</strong></a> -->
     <br />
     <br />
     <!-- <a href="https://youtu.be">View Demo</a> -->
