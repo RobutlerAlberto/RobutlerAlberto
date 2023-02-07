@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 import rospy
 from alberto_get_camera_footage import image
-from std_msgs.msg import Int16
+from std_msgs.msg import Int16,Bool
 from colorama import Fore, Back, Style
 from termcolor import colored
 class ColorDetection:
@@ -74,8 +74,14 @@ class ColorDetection:
         # Listens for the mission ID
         self.mission_listener = rospy.Subscriber("/active_mission_ID", Int16, self.mission_listener_callback)
 
+        self.object_found_pub = rospy.Publisher("/object_found",Bool,queue_size=10)
+        
+
         # Image processing
         self.image_processor()
+
+    def object_found_callback(msg,data):
+        pass
 
     def image_processor(self):
         # While ROS is running
@@ -173,6 +179,7 @@ class ColorDetection:
                         self.centroids[key] = current_centroids[i]
                         break
 
+                
                 if not self.found:
                     self.object_id += 1
                     self.assigned_ids[self.detected_contours.pop()] = self.object_id
@@ -198,6 +205,10 @@ class ColorDetection:
                 if self.found == True and not self.printed:
                     print(Style.BRIGHT + Back.BLACK + Fore.GREEN + 'Object of color ' + colored(self.color, self.print_color) + Fore.GREEN + Style.BRIGHT + Back.BLACK + ' was detected' + Style.RESET_ALL)
                     self.printed = True
+
+                    found_msg = Bool()
+                    found_msg.data = self.found
+                    self.object_found_pub.publish(found_msg)
         
         # Destroy all windows
         cv2.destroyAllWindows()
