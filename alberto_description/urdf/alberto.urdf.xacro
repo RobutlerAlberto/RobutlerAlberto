@@ -167,10 +167,40 @@
     </inertial>
   </link>
 
-  <joint name="depth_camera_joint" type="fixed">
+  <joint name="camera_arm_joint" type="fixed">
     <axis xyz="0 1 0" />
-    <origin xyz="0 0 0.5" rpy="0 0 0" />
+    <origin xyz="0 0 0.4" rpy="0 0 0" />
     <parent link="base_link" />
+    <child link="camera_arm_link" />
+  </joint>
+
+  <link name="camera_arm_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="${camera_link} ${camera_link} 0.435" />
+      </geometry>
+    </collision>
+
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="${camera_link} ${camera_link} 0.435" />
+      </geometry>
+      <material name="blue" />
+    </visual>
+
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+
+  <joint name="depth_camera_joint" type="fixed">
+    <axis xyz="0 0 0" />
+    <origin xyz="0 0 0.2425" rpy="0 0 0" />
+    <parent link="camera_arm_link" />
     <child link="depth_camera_link" />
   </joint>
 
