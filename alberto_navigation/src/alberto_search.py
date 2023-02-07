@@ -179,7 +179,7 @@ class Search():
         self.current_orientation = None
         self.goal_reached   = False
         self.goal_object    = None
-        self.object_found   = False
+        # self.object_found   = False
         self.final_stop     = False
         self.mission_active = False
         self.next_stop = None
@@ -188,7 +188,8 @@ class Search():
         # self.goal_listener      = rospy.Subscriber("/move_base/status",GoalStatusArray,self.goal_listener_callback)
         self.goal_listener      = rospy.Subscriber("/move_base/result",MoveBaseActionResult,self.goal_listener_callback)
         self.mission_listener   = rospy.Subscriber("/active_mission_ID",Int16,self.mission_listener_callback)
-        self.orientation_listener = rospy.Subscriber('/imu', Imu, self.orientation_listener_callback)
+        self.object_found_listener = rospy.Subscriber("/object_found", Bool, self.object_found_listener_callback)
+        # self.orientation_listener = rospy.Subscriber('/imu', Imu, self.orientation_listener_callback)
         self.goal_publisher     = rospy.Publisher('/goal_coords', Point, queue_size=10)
         self.turning_publisher  = rospy.Publisher('/cmd_vel', Twist, queue_size=2)
         self.nav_goal_cancel_pub = rospy.Publisher(goal_cancel_topic,Bool,queue_size=10)
@@ -201,12 +202,11 @@ class Search():
         # self.current_coords = None
         self.goal_reached   = False
         self.goal_object    = None
-        self.object_found   = False
+        # self.object_found   = False
         self.final_stop     = False
         self.mission_active = False
         self.state          ='dormant'
         self.next_stop      = None
-        self.object_found   = False
 
     def run(self):
         while not rospy.is_shutdown():
@@ -488,38 +488,36 @@ class Search():
             self.mission_active = True
             self.state = 'ready_for_path'
 
-    def orientation_listener_callback(self, data):
-        quaternion_orientation = data.orientation
-        self.current_orientation = self.euler_from_quaternion(
-            quaternion_orientation.x,
-            quaternion_orientation.y,
-            quaternion_orientation.z,
-            quaternion_orientation.w)
+    def object_found_listener_callback(self, data):
+        if self.mission_active and self.mission_description!="count_num_of_cubes_in_house":
+            self.reset()
 
-    def euler_from_quaternion(self, x, y, z, w):
-        t0 = +2.0 * (w * x + y * z)
-        t1 = +1.0 - 2.0 * (x * x + y * y)
-        roll_x = math.atan2(t0, t1)
-     
-        t2 = +2.0 * (w * y - z * x)
-        t2 = +1.0 if t2 > +1.0 else t2
-        t2 = -1.0 if t2 < -1.0 else t2
-        pitch_y = math.asin(t2)
-     
-        t3 = +2.0 * (w * z + x * y)
-        t4 = +1.0 - 2.0 * (y * y + z * z)
-        yaw_z = math.atan2(t3, t4)
-     
-        return roll_x, pitch_y, yaw_z # in radians
+    # def orientation_listener_callback(self, data):
+    #     quaternion_orientation = data.orientation
+    #     self.current_orientation = self.euler_from_quaternion(
+    #         quaternion_orientation.x,
+    #         quaternion_orientation.y,
+    #         quaternion_orientation.z,
+    #         quaternion_orientation.w)
 
-    def positive_angle_range(self, angle):
-        return angle if (angle>=0) else (2*math.pi + angle)
-            
+    # def euler_from_quaternion(self, x, y, z, w):
+    #     t0 = +2.0 * (w * x + y * z)
+    #     t1 = +1.0 - 2.0 * (x * x + y * y)
+    #     roll_x = math.atan2(t0, t1)
+     
+    #     t2 = +2.0 * (w * y - z * x)
+    #     t2 = +1.0 if t2 > +1.0 else t2
+    #     t2 = -1.0 if t2 < -1.0 else t2
+    #     pitch_y = math.asin(t2)
+     
+    #     t3 = +2.0 * (w * z + x * y)
+    #     t4 = +1.0 - 2.0 * (y * y + z * z)
+    #     yaw_z = math.atan2(t3, t4)
+     
+    #     return roll_x, pitch_y, yaw_z # in radians
 
-    # def init_publisher(self):
-    #     rospy.loginfo('INIT PUBLISHER !!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    #     pub = rospy.Publisher('/goal_coords', Point, queue_size=10)
-    #     return pub
+    # def positive_angle_range(self, angle):
+    #     return angle if (angle>=0) else (2*math.pi + angle)
 
     def __str__(self):
         return "robot position: " + str(self.current_coords)
