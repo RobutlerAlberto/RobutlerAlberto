@@ -169,9 +169,23 @@ The robot can be controlled in several distinct ways:
  - Selection of XY coordinates in RViz
  - With semantic information by doing right click on the robot and selecting a division for it to go.
 ***
+
+### Object spawning
+It is possible to spawn random objects in gazebo by running:
+```
+rosrun alberto_vision alberto_object_spawn_terminal.py
+```
+
+It is also possible to control which objects you want to spawn, the color and where with args:
+```
+rosrun alberto_vision alberto_object_spawn_terminal.py -o 'cube' -c 'red' -r 'living_room'
+
+```
+***
  ### Robot features
+ #### Robot search
 Also, with the right click on the robot you can see the several things the robot can do, like searching for objects and even persons.
-#### 
+***
 <!-- CONTRIBUTING -->
 ## Contributing
 
