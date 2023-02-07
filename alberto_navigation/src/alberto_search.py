@@ -198,7 +198,7 @@ class Search():
         self.run()
 
     def reset(self):
-        self.search_path    = None
+        self.search_path    = []
         # self.current_coords = None
         self.goal_reached   = False
         self.goal_object    = None
@@ -207,6 +207,12 @@ class Search():
         self.mission_active = False
         self.state          ='dormant'
         self.next_stop      = None
+
+        linear = Vector3(x=0, y=0, z=0)
+        angular = Vector3(x=0, y=0, z=0)
+        stop_turn = Twist(linear=linear, angular=angular)
+        self.turning_publisher.publish(stop_turn)
+
 
     def run(self):
         while not rospy.is_shutdown():
@@ -490,6 +496,8 @@ class Search():
 
     def object_found_listener_callback(self, data):
         if self.mission_active and self.mission_description!="count_num_of_cubes_in_house":
+            rospy.loginfo("Found object, resetting")
+            self.cancelNavgoal()
             self.reset()
 
     # def orientation_listener_callback(self, data):
