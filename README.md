@@ -38,11 +38,11 @@
   <p align="center">
     Repository for a Robot Butler project developed for the course of Programming of Robotic Systems at the University of Aveiro, 2022/2023.
     <br />
-    <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/wiki"><strong>Explore the Wiki »</strong></a>
+    <!-- <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/wiki"><strong>Explore the Wiki »</strong></a> -->
     <br />
     <br />
-    <a href="https://youtu.be">View Demo</a>
-    ·
+    <!-- <a href="https://youtu.be">View Demo</a> -->
+    <!-- · -->
     <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/issues">Report Bug</a>
     ·
     <a href="https://github.com/RobutlerAlberto/RobutlerAlberto/issues">Request Feature</a>
@@ -169,9 +169,23 @@ The robot can be controlled in several distinct ways:
  - Selection of XY coordinates in RViz
  - With semantic information by doing right click on the robot and selecting a division for it to go.
 ***
+
+### Object spawning
+It is possible to spawn random objects in gazebo by running:
+```
+rosrun alberto_vision alberto_object_spawn_terminal.py
+```
+
+It is also possible to control which objects you want to spawn, the color and where with args:
+```
+rosrun alberto_vision alberto_object_spawn_terminal.py -o 'cube' -c 'red' -r 'living_room'
+
+```
+***
  ### Robot features
+ #### Robot search
 Also, with the right click on the robot you can see the several things the robot can do, like searching for objects and even persons.
-#### 
+***
 <!-- CONTRIBUTING -->
 ## Contributing
 
@@ -232,5 +246,5 @@ Project Link: [Robutler Alberto](https://github.com/RobutlerAlberto/RobutlerAlbe
 [issues-shield]: https://img.shields.io/github/issues/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
 [issues-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/issues
 [license-shield]: https://img.shields.io/github/license/RobutlerAlberto/RobutlerAlberto.svg?style=for-the-badge
-[license-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/blob/master/LICENSE.txt
+[license-url]: https://github.com/RobutlerAlberto/RobutlerAlberto/blob/master/license.txt
 [product-screenshot]: docs/logo.png
